@@ -65,14 +65,10 @@ public class GameManager : Singleton<GameManager>
     private void Update()
     {
         if (_currentGameState == GameState.PREGAME)
-        {
             return;
-        }
 
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             TogglePause();
-        }
     }
 
     private void OnLoadOperationComplete(AsyncOperation ao)
@@ -84,25 +80,19 @@ public class GameManager : Singleton<GameManager>
             _loadOperations.Remove(ao);
 
             if (_loadOperations.Count == 0)
-            {
                 UpdateState(GameState.RUNNING);
-            }
         }
-        Debug.Log("Load finished");
     }
 
     private void OnUnloadOperationComplete(AsyncOperation ao)
     {
         _loadOperations.Remove(ao);
-        Debug.Log("Unload finished");
     }
 
     void HandleMainMenuFadeComplete(bool fadeOut)
     {
         if (!fadeOut)
-        {
             UnloadLevel(_currentLevelName);
-        }
     }
 
     void UpdateState(GameState state)
@@ -137,7 +127,6 @@ public class GameManager : Singleton<GameManager>
         }
 
         Debug.Log(previousGameState + " -> " + _currentGameState);
-        //OnGameStateChanged.Invoke(_currentGameState, previousGameState);
         EventManager.Instance.OnGameStateChanged.Invoke(_currentGameState, previousGameState);
 
     }
@@ -154,8 +143,6 @@ public class GameManager : Singleton<GameManager>
 
     public void LoadLevel(string levelName)
     {
-        Debug.Log("In LoadLevel");
-
         // loading additively so boot scene persists
         AsyncOperation ao = SceneManager.LoadSceneAsync(levelName, LoadSceneMode.Additive);
         if (ao == null)
@@ -176,8 +163,6 @@ public class GameManager : Singleton<GameManager>
 
     public void UnloadLevel(string levelName)
     {
-        Debug.Log("In UnloadLevel");
-
         AsyncOperation ao =  SceneManager.UnloadSceneAsync(levelName);
         if (ao == null)
         {
@@ -200,30 +185,24 @@ public class GameManager : Singleton<GameManager>
     {
         base.OnDestroy();
 
-        GameObject prefabInstance;
         for (int i = 0; i < _instancedSystemPrefabs.Count; i++)
-        {
             Destroy(_instancedSystemPrefabs[i]);
-        }
 
         _instancedSystemPrefabs.Clear();
     }
 
     public void StartGame()
     {
-        Debug.Log("In StartGame");
         LoadLevel("Main");
     }
 
     public void TogglePause()
     {
-        Debug.Log("In TogglePause");
         UpdateState(_currentGameState == GameState.RUNNING ? GameState.PAUSED : GameState.RUNNING);
     }
 
     public void RestartGame()
     {
-        Debug.Log("In RestartGame");
         UpdateState(GameState.PREGAME);
     }
 

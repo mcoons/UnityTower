@@ -13,27 +13,20 @@ public class PauseMenu : MonoBehaviour {
         ResumeButton.onClick.AddListener(HandleResumeClicked);
         RestartButton.onClick.AddListener(HandleRestartClicked);
         QuitButton.onClick.AddListener(HandleQuitClicked);
-
     }
 
     void HandleResumeClicked()
     {
-        Debug.Log("In PauseMenu.HandleResumeClicked");
-
         GameManager.Instance.TogglePause();
     }
 
     void HandleRestartClicked()
     {
-        Debug.Log("In PauseMenu.HandleRestartClicked");
-
         GameManager.Instance.RestartGame();
     }
 
     void HandleQuitClicked()
     {
-        Debug.Log("In PauseMenu.HandleQuitClicked");
-
         GameManager.Instance.QuitGame();
     }
 

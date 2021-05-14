@@ -10,96 +10,88 @@ public class Item : MonoBehaviour
     public string baseName;
     public GameManager.ItemType _type = GameManager.ItemType.SPHERE_RED;
 
-    public bool beenChecked = false;
-    public bool matches = false;
-
-
+    //public bool beenChecked = false;
+    public bool matched = false;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        EventManager.Instance.OnObjectSelected.AddListener(OnObjectSelected);
-        EventManager.Instance.OnObjectMatched.AddListener(OnObjectMatched);
+        _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
+
+        EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
+
+        int index = Random.Range(0, 4);
+        if (index == 0)
+            _type = GameManager.ItemType.SPHERE_RED;
+        if (index == 1)
+            _type = GameManager.ItemType.SPHERE_GREEN;
+        if (index == 2)
+            _type = GameManager.ItemType.SPHERE_BLUE;
+
         SetMaterial();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
-    private void LateUpdate()
+    private void Update()
     {
         transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
         _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
-
-        if (_globalPosition.y == 4)
-        {
-            _type = GameManager.ItemType.SPHERE_BLUE;
-            SetMaterial();
-        }
     }
 
-    private void OnMouseDown()
+    private void OnMouseUpAsButton()
     {
-        if (_globalPosition.z >= 0) return;
-        Debug.Log(transform.name + " was clicked.");
-
-
-        EventManager.Instance.OnObjectSelected.Invoke(_type, _globalPosition);
-    }
-
-    public void OnObjectSelected(GameManager.ItemType type, Vector3 gPosition)
-    {
-
-        if (gPosition == _globalPosition)
-        {   // it is me
-            matches = true;
-            transform.GetChild(0).gameObject.SetActive(true);
-
+        if (_globalPosition.z >= 0)
             return;
-        }
+        if (TowerManager.Instance.TowerInRotation())
+            return;
+        if (TowerManager.Instance.LevelsInRotation())
+            return;
+        if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
+            return;
+
+        if (matched == true)
+            TowerManager.Instance.RemoveMatches();
         else
-        {   // it is not me
-            matches = false;
-            transform.GetChild(0).gameObject.SetActive(false);
-        }
-
-
-        EventManager.Instance.OnObjectMatched.Invoke(type, _globalPosition);
-
-
-        //// check if I am a neighbor
-        //if (Vector3.Distance(gPosition, _globalPosition) < 1.25 && _type == type)
-        //{
-        //    matches = true;
-        //    transform.GetChild(0).gameObject.SetActive(true);
-        //    EventManager.Instance.OnObjectMatched.Invoke(_type, _globalPosition);
-        //}
-        //else
-        //{
-
-        //}
-
-
+            HandleOnObjectSelected(transform.name, _type, _globalPosition);
     }
 
-    public void OnObjectMatched(GameManager.ItemType type, Vector3 gPosition)
+    private void HandleOnObjectSelected(string sender, GameManager.ItemType type, Vector3 gPosition)
     {
-        if (matches) return;
 
-        if (Vector3.Distance(gPosition, _globalPosition) < 1.05 && _type == type)
+        TowerManager.Instance.ClearItemStates();
+
+        matched = true;
+        TowerManager.Instance.matchCount++;
+        transform.GetChild(0).gameObject.SetActive(true);
+        EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
+
+    }
+
+    public void HandleOnObjectMatched(string sender, GameManager.ItemType type, Vector3 gPosition)
+    {
+        if (matched)
+            return;
+        if (Vector3.Distance(gPosition, _globalPosition) > 1.05)
+            return;
+
+        //Debug.Log(gPosition + " <-> " + _globalPosition + " = " + Vector3.Distance(gPosition, _globalPosition));
+
+        if (_type == type)
         {
-            matches = true;
-            Debug.Log(transform.name + " was matched");
-            EventManager.Instance.OnObjectMatched.Invoke(type, _globalPosition);
+            matched = true;
+            TowerManager.Instance.matchCount++;
             transform.GetChild(0).gameObject.SetActive(true);
+            EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
         }
     }
 
-    public void SetMaterial()
+    private void SetMaterial()
     {
         GetComponent<Renderer>().material = GameManager.Instance._materials[(int)_type];
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.Instance.OnObjectMatched.RemoveListener(HandleOnObjectMatched);
     }
 }

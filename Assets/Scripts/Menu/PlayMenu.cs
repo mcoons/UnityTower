@@ -58,7 +58,6 @@ public class PlayMenu : MonoBehaviour
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
             return;
 
-        Debug.Log("In PlayMenu.HandleLevelRotationClicked: " + level + " - " + direction );
         TowerManager.Instance.RotateLevel(level, direction);
     }
 
@@ -67,30 +66,22 @@ public class PlayMenu : MonoBehaviour
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
             return;
 
-        Debug.Log("In PlayMenu.HandleTowerRotationClicked: " + direction);
         TowerManager.Instance.RotateTower(direction);
-
     }
 
 
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
     {
-        Debug.Log("In PlayMenu.HandleGameStateChanged");
         if ((previousState == GameManager.GameState.PREGAME && currentState == GameManager.GameState.RUNNING))
-        {
             FadeIn();
-        }
 
         if (previousState == GameManager.GameState.PAUSED && currentState == GameManager.GameState.PREGAME)
-        {
             FadeOut();
-        }
     }
 
     public void FadeIn()
     {
         _buttonPanel.SetActive(true);
-        Debug.Log("In PlayMenu.FadeIn");
 
         _playMenuAnimator.Stop();
         _playMenuAnimator.clip = _fadeInAnimation;
@@ -100,8 +91,6 @@ public class PlayMenu : MonoBehaviour
 
     public void FadeOut()
     {
-        Debug.Log("In PlayMenu.FadeOut");
-
         UIManager.Instance.SetDummyCameraActive(false);
 
         _playMenuAnimator.Stop();
@@ -112,8 +101,6 @@ public class PlayMenu : MonoBehaviour
 
     public void OnFadeOutComplete()
     {
-        Debug.Log("In PlayMenu.OnFadeOutComplete");
-
         _buttonPanel.SetActive(false);
 
     }

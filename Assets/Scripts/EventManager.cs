@@ -30,8 +30,8 @@ public class EventManager : Singleton<EventManager>
 
 
     // Item
-    public Events.ObjectSelected OnObjectSelected;
-    public Events.ObjectSelected OnObjectMatched;
+    //public Events.ObjectSelected OnObjectSelected;
+    public Events.ObjectMatched OnObjectMatched;
 
 
     // from TowerManager
