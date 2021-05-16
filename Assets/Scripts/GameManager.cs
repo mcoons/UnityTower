@@ -80,13 +80,16 @@ public class GameManager : Singleton<GameManager>
             _loadOperations.Remove(ao);
 
             if (_loadOperations.Count == 0)
+            {
                 UpdateState(GameState.RUNNING);
+            }
         }
     }
 
     private void OnUnloadOperationComplete(AsyncOperation ao)
     {
         _loadOperations.Remove(ao);
+
     }
 
     void HandleMainMenuFadeComplete(bool fadeOut)

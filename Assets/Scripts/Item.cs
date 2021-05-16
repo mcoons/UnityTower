@@ -5,13 +5,19 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
 
-    [SerializeField] Vector3 _globalPosition;
+    [SerializeField] public Vector3 _globalPosition;
 
     public string baseName;
     public GameManager.ItemType _type = GameManager.ItemType.SPHERE_RED;
 
     //public bool beenChecked = false;
     public bool matched = false;
+
+
+    public bool isDropping = false;
+    public float itemDropStartTime = 0;
+    public Vector3 itemStartPosition;
+    public Vector3 itemDesiredPosition;
 
 
     // Start is called before the first frame update
@@ -34,9 +40,39 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
+        if (isDropping)
+        {
+            itemObjectLerpDrop();
+        }
+
         transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
         _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
     }
+
+
+
+    public void itemObjectLerpDrop()
+    {
+        //Debug.Log("In towerObjectLerpRotation");
+        float dropTime = 4.0f;  // 4.0f equates to .25 seconds
+
+        // Rotate the groupBlock over a period of rotationTime using Lerp
+        transform.position = Vector3.Lerp(itemStartPosition, itemDesiredPosition, (Time.time - itemDropStartTime) * dropTime);
+
+        // Once rotationTime has elapsed and the Lerp is done set inRotation to false
+        if (Time.time - itemDropStartTime > 1 / dropTime)
+        {
+            isDropping = false;
+            transform.position = itemDesiredPosition;
+
+            TowerManager.Instance.getColumnIntersects();
+            transform.SetParent(TowerManager.Instance._levelTransforms[(int)itemDesiredPosition.y]);
+        }
+        transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
+        _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
+    }
+
+
 
     private void OnMouseUpAsButton()
     {
@@ -44,13 +80,16 @@ public class Item : MonoBehaviour
             return;
         if (TowerManager.Instance.TowerInRotation())
             return;
-        if (TowerManager.Instance.LevelsInRotation())
+        if (TowerManager.Instance.areLevelsInRotation())
             return;
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
             return;
 
         if (matched == true)
+        {
             TowerManager.Instance.RemoveMatches();
+            TowerManager.Instance.PrepareItemDrop();
+        }
         else
             HandleOnObjectSelected(transform.name, _type, _globalPosition);
     }

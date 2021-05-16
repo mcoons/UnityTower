@@ -5,7 +5,7 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
 
-    // Track animation component
+    // Track animation components
     // Track animation clips for fade in/out
     // Function that can receive animation events
     // Functions to play fade in/out animations

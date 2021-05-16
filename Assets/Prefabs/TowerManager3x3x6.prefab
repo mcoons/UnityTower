@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7557911748922427442}
   - component: {fileID: 7002372563032747637}
+  - component: {fileID: 382719062}
   m_Layer: 0
-  m_Name: TowerManager
+  m_Name: TowerManager3x3x6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,3 +44,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f94fe8e191e8d47d4842031711b51ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  towerLength: 3
+  towerWidth: 3
+  towerHeight: 6
+  _towerObject: {fileID: 0}
+  _levelTransforms: []
+  hitColliders0: []
+  hitColliders1: []
+  hitColliders2: []
+  hitColliders3: []
+  hitColliders4: []
+  hitColliders5: []
+  hitColliders6: []
+  hitColliders7: []
+  hitColliders8: []
+  isLevelInRotation: 
+  dropCount: 0
+  matchCount: 0
+--- !u!114 &382719062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7427867636364129290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7ea027fe37ae49ec9f6e82e20819924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _itemPrefab: {fileID: 3561655117392332185, guid: 8e60198daf58c41e4bf8ca1aaf89527d, type: 3}
