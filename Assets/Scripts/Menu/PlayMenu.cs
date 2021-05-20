@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +7,7 @@ public class PlayMenu : MonoBehaviour
     [SerializeField] private AnimationClip _fadeOutAnimation;
     [SerializeField] private AnimationClip _fadeInAnimation;
 
+    //TODO convert to dynamic sizable x,y,z
     [SerializeField] private Button LeftLevel5;
     [SerializeField] private Button LeftLevel4;
     [SerializeField] private Button LeftLevel3;
@@ -16,6 +15,7 @@ public class PlayMenu : MonoBehaviour
     [SerializeField] private Button LeftLevel1;
     [SerializeField] private Button LeftLevel0;
 
+    //TODO convert to dynamic sizable x,y,z
     [SerializeField] private Button RightLevel5;
     [SerializeField] private Button RightLevel4;
     [SerializeField] private Button RightLevel3;
@@ -27,6 +27,15 @@ public class PlayMenu : MonoBehaviour
     [SerializeField] private Button LeftTower;
 
     [SerializeField] private GameObject _buttonPanel;
+
+    [SerializeField] private Text countRed;
+    [SerializeField] private Text countGreen;
+    [SerializeField] private Text countBlue;
+    [SerializeField] private Text countOrange;
+    [SerializeField] private Text countYellow;
+    [SerializeField] private Text countIndigo;
+    [SerializeField] private Text countViolet;
+
 
     void Start()
     {
@@ -50,12 +59,24 @@ public class PlayMenu : MonoBehaviour
 
         EventManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChanged);
         //EventManager.Instance.OnPlayMenuFadeComplete.AddListener(OnFadeOutComplete);
+    }
 
+    private void Update()
+    {
+        countRed.text = TowerManager.Instance.typeCounts[0].ToString();
+        countGreen.text = TowerManager.Instance.typeCounts[1].ToString();
+        countBlue.text = TowerManager.Instance.typeCounts[2].ToString();
+        countOrange.text = TowerManager.Instance.typeCounts[3].ToString();
+        countYellow.text = TowerManager.Instance.typeCounts[4].ToString();
+        countIndigo.text = TowerManager.Instance.typeCounts[5].ToString();
+        countViolet.text = TowerManager.Instance.typeCounts[6].ToString();
     }
 
     public void HandleLevelRotationClicked(int level, int direction)
     {
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
+            return;
+        if (TowerManager.Instance.dropCount != 0)
             return;
 
         TowerManager.Instance.RotateLevel(level, direction);
@@ -64,6 +85,8 @@ public class PlayMenu : MonoBehaviour
     public void HandleTowerRotationClicked(int direction)
     {
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
+            return;
+        if (TowerManager.Instance.dropCount != 0)
             return;
 
         TowerManager.Instance.RotateTower(direction);
@@ -86,7 +109,6 @@ public class PlayMenu : MonoBehaviour
         _playMenuAnimator.Stop();
         _playMenuAnimator.clip = _fadeInAnimation;
         _playMenuAnimator.Play();
-
     }
 
     public void FadeOut()
@@ -102,7 +124,6 @@ public class PlayMenu : MonoBehaviour
     public void OnFadeOutComplete()
     {
         _buttonPanel.SetActive(false);
-
     }
 
 }

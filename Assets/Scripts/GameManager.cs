@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Events;
-
 
 public class GameManager : Singleton<GameManager>
 {
@@ -17,32 +14,20 @@ public class GameManager : Singleton<GameManager>
     {
         PREGAME,
         RUNNING,
-        PAUSED
+        PAUSED,
+        OPTIONS,
+        WIN,
+        LOSS
     }
-
-    public enum ItemType
-    {
-        SPHERE_RED,
-        SPHERE_GREEN,
-        SPHERE_BLUE,
-
-        MATCHED,
-
-        WIZARD,
-        DEATH
-    }
-
-    public Material[] _materials;
-
-    //public Events.EventGameState OnGameStateChanged;
 
     public GameObject[] SystemPrefabs;  // list of system prefabs to load that live in the scope of boot
     private List<GameObject> _instancedSystemPrefabs;  // list of which SystemPrefabs have been instanced
-
-    [SerializeField] private string _currentLevelName = string.Empty;
     [SerializeField] List<AsyncOperation> _loadOperations;  // used to track active load operations 
 
     [SerializeField] GameState _currentGameState = GameState.PREGAME;
+    [SerializeField] private string _currentLevelName = string.Empty;
+    public int levelSeed = 1;
+    public int _masterTypeCount = 3;
 
     public GameState CurrentGameState
     {
@@ -60,6 +45,8 @@ public class GameManager : Singleton<GameManager>
         InstantiateSystemPrefabs();
 
         EventManager.Instance.OnMainMenuFadeComplete.AddListener(HandleMainMenuFadeComplete);
+        EventManager.Instance.OnGameLoss.AddListener(OnGameLoss);
+        EventManager.Instance.OnGameWin.AddListener(OnGameWin);
     }
 
     private void Update()
@@ -89,7 +76,6 @@ public class GameManager : Singleton<GameManager>
     private void OnUnloadOperationComplete(AsyncOperation ao)
     {
         _loadOperations.Remove(ao);
-
     }
 
     void HandleMainMenuFadeComplete(bool fadeOut)
@@ -123,6 +109,15 @@ public class GameManager : Singleton<GameManager>
                 Time.timeScale = 0.0f;
                 break;
 
+            case GameState.WIN:
+                Debug.Log("Game Won");
+                Time.timeScale = 0.75f;
+                break;
+
+            case GameState.LOSS:
+                Debug.Log("Game Lost");
+                Time.timeScale = 0.75f;
+                break;
             default:
 
                 break;
@@ -204,11 +199,25 @@ public class GameManager : Singleton<GameManager>
         UpdateState(_currentGameState == GameState.RUNNING ? GameState.PAUSED : GameState.RUNNING);
     }
 
+    public void OnOptions()
+    {
+        UpdateState(GameState.OPTIONS);
+    }
+
     public void RestartGame()
     {
         UpdateState(GameState.PREGAME);
     }
 
+    public void OnGameLoss()
+    {
+        UpdateState(GameState.LOSS);
+    }
+
+    public void OnGameWin()
+    {
+        UpdateState(GameState.WIN);
+    }
 
     public void QuitGame()
     {

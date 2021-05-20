@@ -1,0 +1,87 @@
+﻿
+Clean and Optimize
+
+Clean unnecessary SerializedFields/permissions
+
+Change all data types to be dynamic for tower sizes
+
+Review Messaging logic for timing issues
+
+Add audio
+    Rotation
+    Explosion
+    Win
+    Loss
+
+Tower Build sound?
+
+Validate Tables upon build
+
+Add Text to UI Manager
+    Selected
+    Score
+    Timer
+
+Add isGameOver() Logic
+    Any two in the center column and a corner column
+    Any two both on layer 0 and not neighbors
+
+
+Add the ability for color selection for color blind users.
+
+
+Earned Mechanics
+- Explode center
+- Invert tower
+
+
+Player Achievements
+- Mass Extention Bonus - Removing all of one type in a 10+ group
+- Full Column Bonus - All 6
+- Partial Column Bonus - 5
+- Row Bonus
+- Plane Bonus
+-
+
+Game Types
+
+Without Dropper (dwindling)
+
+Extinction
+
+
+With Dropper (replenishment)
+
+Timed Levels
+Simon Says
+
+
+Difficulty
+
+Increase in types
+Disable items on a level
+
+
+
+
+--------------------------------------------
+Multiplayer
+User accounts
+
+Type 1
+
+Single board using constant refill.
+Two rotates and a removal per turn.
+Separate points
+Win bonus
+Best of 5
+
+
+Type 2
+
+Two identical boards using constant refill
+Timed start
+Quickest winner
+Best of 5
+
+

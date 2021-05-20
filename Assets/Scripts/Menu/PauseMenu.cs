@@ -1,11 +1,11 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour {
 
     [SerializeField] private Button ResumeButton;
     [SerializeField] private Button RestartButton;
+    [SerializeField] private Button OptionsButton;
     [SerializeField] private Button QuitButton;
 
     private void Start()
@@ -13,6 +13,7 @@ public class PauseMenu : MonoBehaviour {
         ResumeButton.onClick.AddListener(HandleResumeClicked);
         RestartButton.onClick.AddListener(HandleRestartClicked);
         QuitButton.onClick.AddListener(HandleQuitClicked);
+        OptionsButton.onClick.AddListener(HandleOptionsClicked);
     }
 
     void HandleResumeClicked()
@@ -28,6 +29,13 @@ public class PauseMenu : MonoBehaviour {
     void HandleQuitClicked()
     {
         GameManager.Instance.QuitGame();
+    }
+
+    void HandleOptionsClicked()
+    {
+        Debug.Log("Options Clicked");
+        GameManager.Instance.OnOptions();
+
     }
 
 }

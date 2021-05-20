@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Timers;
 using UnityEngine;
 
 public class TowerManager : Singleton<TowerManager>
@@ -9,6 +8,27 @@ public class TowerManager : Singleton<TowerManager>
     [SerializeField] public int towerLength = 3;
     [SerializeField] public int towerWidth = 3;
     [SerializeField] public int towerHeight = 6;
+    //[SerializeField] public int gemTypeCount;
+    public bool gameLost = false;
+    public bool gameWon = false;
+
+    public enum ItemType
+    {
+        SPHERE_RED,
+        SPHERE_GREEN,
+        SPHERE_BLUE,
+        SPHERE_ORANGE,
+        SPHERE_YELLOW,
+        SPHERE_INDIGO,
+        SPHERE_VIOLET
+    }
+
+
+    [SerializeField] public List<int> typeCounts = new List<int>();
+    [SerializeField] public List<List<GameObject>> typeGroups = new List<List<GameObject>>();
+
+    public Material[] _itemMaterials;
+    public Material[] _selectorMaterials;
 
     //public GameObject TowerPrefab;
     [SerializeField] private GameObject _towerObject;
@@ -35,14 +55,10 @@ public class TowerManager : Singleton<TowerManager>
     List<Quaternion> levelStartRotation = new List<Quaternion>();
     List<Quaternion> levelDesiredRotation = new List<Quaternion>();
 
-
-    //bool[] levelInRotation = new bool[towerHeight];
-    //float[] levelRotationStartTime = new float[towerHeight];
-    //Quaternion[] levelStartRotation = new Quaternion[towerHeight];
-    //Quaternion[] levelDesiredRotation = new Quaternion[towerHeight];
-
     public int dropCount = 0;				// Current count of objects dropping
     public int matchCount = 0;
+
+    private IEnumerator delayDestroyCoroutine;
 
     #endregion
 
@@ -59,10 +75,20 @@ public class TowerManager : Singleton<TowerManager>
 
     //TODO convert to dynamic sizable x,y,z
     public bool areLevelsInRotation() { return (isLevelInRotation[0] || isLevelInRotation[1] || isLevelInRotation[2] || isLevelInRotation[3] || isLevelInRotation[4] || isLevelInRotation[5]); }
+    public bool isDropping() { return (dropCount > 0); }
 
-    private static Timer timer1;
+    public int getItemCount()
+    {
+        int count = 0;
+
+        foreach (int typeCount in typeCounts)
+        {
+            count += typeCount;
+        }
 
 
+        return count;
+    }
 
     //private void Awake()
     //{
@@ -78,7 +104,7 @@ public class TowerManager : Singleton<TowerManager>
     // Start is called before the first frame update
     void Start()
     {
-
+        ItemManager.Instance.initBag();
         _towerObject = TowerBuilder.Instance.ConstructTower(towerLength, towerHeight, towerWidth);
 
         //Debug.Break();
@@ -97,13 +123,26 @@ public class TowerManager : Singleton<TowerManager>
             //PrintLevel(i);
         }
 
-        getColumnIntersects();
+
+        UpdateGemTypeCount(GameManager.Instance._masterTypeCount);
 
     }
 
+    public void UpdateGemTypeCount(int newCount)
+    {
+        GameManager.Instance._masterTypeCount = newCount;
+        typeCounts.Clear();
+        typeGroups.Clear();
+        for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
+        {
+            typeCounts.Add(0);
+            typeGroups.Add(new List<GameObject> { });
+        }
+    }
 
     public void getColumnIntersects()
     {
+        //TODO convert to dynamic sizable x,y,z
         hitColliders0 = Physics.OverlapBox(new Vector3(-1, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
         hitColliders1 = Physics.OverlapBox(new Vector3(0, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
         hitColliders2 = Physics.OverlapBox(new Vector3(1, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
@@ -114,6 +153,8 @@ public class TowerManager : Singleton<TowerManager>
         hitColliders7 = Physics.OverlapBox(new Vector3(0, 0, 1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
         hitColliders8 = Physics.OverlapBox(new Vector3(1, 0, 1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
 
+
+        //TODO convert to dynamic sizable x,y,z - loop this
 
         Array.Sort(hitColliders0, delegate (Collider c1, Collider c2) {
             return c1.transform.position.y.CompareTo(c2.transform.position.y); 
@@ -151,8 +192,6 @@ public class TowerManager : Singleton<TowerManager>
             return c1.transform.position.y.CompareTo(c2.transform.position.y); 
         });
 
-
-
     }
 
     // Update is called once per frame
@@ -171,6 +210,55 @@ public class TowerManager : Singleton<TowerManager>
 
         getColumnIntersects();
 
+    }
+
+    public void ChangeTypeCount(ItemType type, int count)
+    {
+        typeCounts[(int)type] += count;
+    }
+
+    public void AddToTypeGroup(ItemType type, GameObject item)
+    {
+        typeGroups[(int)type].Add(item);
+    }
+
+    public void RemoveFromTypeGroup(ItemType type, GameObject item)
+    {
+        typeGroups[(int)type].Remove(item);
+    }
+
+
+
+    public bool CheckLoss()
+    {
+        Debug.Log("In CheckEndGame");
+        for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
+        {
+            // Any single Type alone
+
+            if (typeCounts[i] == 1) gameLost = true;
+
+            // all in the center column
+
+            // all in the center column and corner columns
+
+            // all on bottom and not neighbors
+
+             
+        }
+
+        if (gameLost) EventManager.Instance.OnGameLoss.Invoke();
+        return gameLost;
+
+    }
+
+    public bool CheckWin()
+    {
+        if (getItemCount() == 0) gameWon = true;
+
+        if (gameWon) EventManager.Instance.OnGameWin.Invoke();
+
+        return gameWon;
     }
 
     /**********************************/
@@ -207,7 +295,7 @@ public class TowerManager : Singleton<TowerManager>
     void towerObjectLerpRotation()
     {
         //Debug.Log("In towerObjectLerpRotation");
-        float rotationTime = 4.0f;  // 4.0f equates to .25 seconds
+        float rotationTime = 2.0f;  // 4.0f equates to .25 seconds
 
         // Rotate the groupBlock over a period of rotationTime using Lerp
         _towerObject.transform.rotation = Quaternion.Slerp(towerStartRotation, towerDesiredRotation, (Time.time - towerRotationStartTime) * rotationTime);
@@ -244,28 +332,24 @@ public class TowerManager : Singleton<TowerManager>
         // Undo the previous rotation
         _levelTransforms[myLevel].Rotate(0, 90 * direction, 0, Space.World);
 
-        // Rotate the matrix values of the level to match
         //AudioFile[(int)SoundQueueIndex.Rotate].Play();
-
     }
 
     // Rotate the level object over time
     void levelObjectLerpRotation(int lvl)
     {
-        float rotationTime = 4.0f;  // 4.0f; // This equates to .25 seconds
+        float rotationTime = 2.0f;  // 4.0f; // This equates to .25 seconds
 
         // Rotate the groupBlock over a period of rotationTime using Lerp
         _levelTransforms[lvl].transform.rotation = Quaternion.Slerp(levelStartRotation[lvl], levelDesiredRotation[lvl], (Time.time - levelRotationStartTime[lvl]) * rotationTime);
 
         // Once rotationTime has elapsed and the Lerp is done set inRotation to false
-        if (Time.time - levelRotationStartTime[lvl] > .25f)
+        if (Time.time - levelRotationStartTime[lvl] > 1/rotationTime)
         {
             isLevelInRotation[lvl] = false;
             _levelTransforms[lvl].rotation = levelDesiredRotation[lvl];
 
-            getColumnIntersects();
-            PrepareItemDrop();
-                
+            PrepareItemDrop("rotate");   
         }
     }
 
@@ -281,8 +365,51 @@ public class TowerManager : Singleton<TowerManager>
         GameObject[] items = GameObject.FindGameObjectsWithTag("Item");
         foreach (GameObject go in items)
         {
+            go.GetComponent<Item>().selected = false;
             go.GetComponent<Item>().matched = false;
             go.transform.GetChild(0).gameObject.SetActive(false);
+        }
+    }
+
+
+
+    public void PrepareItemDrop(string from)
+    {
+        getColumnIntersects();
+
+        //TODO convert to dynamic sizable x,y,z - combine these into the same loop
+        PrepareColumnDrop(hitColliders0, from);
+        PrepareColumnDrop(hitColliders1, from);
+        PrepareColumnDrop(hitColliders2, from);
+        PrepareColumnDrop(hitColliders3, from);
+        PrepareColumnDrop(hitColliders4, from);
+        PrepareColumnDrop(hitColliders5, from);
+        PrepareColumnDrop(hitColliders6, from);
+        PrepareColumnDrop(hitColliders7, from);
+        PrepareColumnDrop(hitColliders8, from);
+    }
+
+    public void PrepareColumnDrop(Collider[] hitColliders, string from)
+    {
+        int index = 0;
+        foreach (Collider c in hitColliders)
+        {
+            if (c.transform.GetComponent<Item>().matched)
+                continue;
+
+            if ((int)Mathf.Round(c.transform.position.y) == index)
+            {
+                index++;
+                continue;
+            }
+
+            c.GetComponent<Item>().itemDropStartTime = Time.time + (from == "match" ? 1 : 0);
+            c.GetComponent<Item>().itemStartPosition = c.transform.position;
+            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
+            c.GetComponent<Item>().isDropping = true;
+            dropCount++;
+
+            index++;
         }
     }
 
@@ -293,270 +420,35 @@ public class TowerManager : Singleton<TowerManager>
         foreach (GameObject go in items)
             if (go.GetComponent<Item>().matched)
             {
-                DestroyItem(go);
+                RemoveFromTypeGroup(go.GetComponent<Item>()._type, go);
+                ChangeTypeCount(go.GetComponent<Item>()._type, -1);
+
+                delayDestroyCoroutine = WaitAndDestroy(go);
+                StartCoroutine(delayDestroyCoroutine);
+                go.GetComponent<Item>()._itemAnimator.Stop();
+                go.GetComponent<Item>()._itemAnimator.clip = go.GetComponent<Item>()._explodeAnimation;
+                go.GetComponent<Item>()._itemAnimator.Play();
             }
 
     }
 
-    public void PrepareItemDrop()
+    private IEnumerator WaitAndDestroy(GameObject go)
     {
-        getColumnIntersects();
-
-        int index = 0;
-        foreach (Collider c in hitColliders0)
+        while (true)
         {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
+            yield return new WaitForSeconds(1);
+            DestroyItem(go);
 
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
         }
-
-        index = 0;
-        foreach (Collider c in hitColliders1)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders2)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders3)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders4)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders5)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders6)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders7)
-        {
-            if (c.transform.GetComponent<Item>().matched)
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-        index = 0;
-        foreach (Collider c in hitColliders8)
-        {
-            if (c.transform.GetComponent<Item>().matched) 
-                continue;
-
-            if ((int)Mathf.Round(c.transform.position.y) == index)
-            {
-                index++;
-                continue;
-            }
-
-
-            c.GetComponent<Item>().itemDropStartTime = Time.time;
-            c.GetComponent<Item>().itemStartPosition = c.transform.position;
-            c.GetComponent<Item>().itemDesiredPosition = new Vector3(c.transform.position.x, index, c.transform.position.z);
-            c.GetComponent<Item>().isDropping = true;
-
-            index++;
-        }
-
-
-
-
-        //for (int i = 0; i < hitColliders0.Length; i++)
-        //{
-        //    if ((int)Mathf.Round(hitColliders0[i].transform.position.y) == i)
-        //    {
-        //        continue;
-        //    }
-
-        //    hitColliders0[i].GetComponent<Item>().itemDropStartTime = Time.time;
-        //    hitColliders0[i].GetComponent<Item>().itemStartPosition = hitColliders0[i].transform.position;
-        //    hitColliders0[i].GetComponent<Item>().itemDesiredPosition = new Vector3(hitColliders0[i].transform.position.x, i, hitColliders0[i].transform.position.z);
-        //    hitColliders0[i].GetComponent<Item>().isDropping = true;
-        //}
-
-        //for (int i = 0; i < hitColliders1.Length; i++)
-        //{
-        //    //if ((int)Mathf.Round( hitColliders0[i].transform.position.y) == i)
-        //    //{
-        //    //    continue;
-        //    //}
-
-        //    hitColliders1[i].GetComponent<Item>().itemDropStartTime = Time.time;
-        //    hitColliders1[i].GetComponent<Item>().itemStartPosition = hitColliders1[i].transform.position;
-        //    hitColliders1[i].GetComponent<Item>().itemDesiredPosition = new Vector3(hitColliders1[i].transform.position.x, i, hitColliders1[i].transform.position.z);
-        //    hitColliders1[i].GetComponent<Item>().isDropping = true;
-        //}
-
-        //for (int i = 0; i < hitColliders2.Length; i++)
-        //{
-        //    //if ((int)Mathf.Round( hitColliders0[i].transform.position.y) == i)
-        //    //{
-        //    //    continue;
-        //    //}
-
-        //    hitColliders2[i].GetComponent<Item>().itemDropStartTime = Time.time;
-        //    hitColliders2[i].GetComponent<Item>().itemStartPosition = hitColliders2[i].transform.position;
-        //    hitColliders2[i].GetComponent<Item>().itemDesiredPosition = new Vector3(hitColliders2[i].transform.position.x, i, hitColliders2[i].transform.position.z);
-        //    hitColliders2[i].GetComponent<Item>().isDropping = true;
-        //}
     }
 
     public void DestroyItem(GameObject go)
     {
-        //int x = (int)Mathf.Round(go.GetComponent<Item>()._globalPosition.x);
-        //int y = (int)Mathf.Round(go.GetComponent<Item>()._globalPosition.y);
-        //int z = (int)Mathf.Round(go.GetComponent<Item>()._globalPosition.z);
-
-        ////_columns[(x.ToString() + ",0," + z.ToString())].Remove(go.transform);
-
         Destroy(go);
     }
 
     public void PrintLevel(int level)
     {
-
-
         foreach (Transform child in _towerObject.transform.GetChild(level))
         {
             Debug.Log(child.name);

@@ -47,6 +47,25 @@ MonoBehaviour:
   towerLength: 3
   towerWidth: 3
   towerHeight: 6
+  gameLost: 0
+  gameWon: 0
+  typeCounts: 
+  _itemMaterials:
+  - {fileID: 2100000, guid: 175e395c73c8b450b8caf1cf285913fb, type: 2}
+  - {fileID: 2100000, guid: 9644f4ff442d64051a7ef07dffced6fb, type: 2}
+  - {fileID: 2100000, guid: 6df26cd6b3000462e882a9cd738b8f4e, type: 2}
+  - {fileID: 2100000, guid: afe4b9a78eac145cc986d63739818197, type: 2}
+  - {fileID: 2100000, guid: 90fb2b49211ec4e8a94d8c5a4e88d90e, type: 2}
+  - {fileID: 2100000, guid: 7bbaa7bfa29184d6ebac1f4f1d281ce6, type: 2}
+  - {fileID: 2100000, guid: 274075308365348acaa6d4a444d79858, type: 2}
+  _selectorMaterials:
+  - {fileID: 2100000, guid: 695fe9a114a654eb29775547a785a7eb, type: 2}
+  - {fileID: 2100000, guid: 64ac0d8241d824fc5a2acfab1f04c676, type: 2}
+  - {fileID: 2100000, guid: 0c75a7982520145e392501ebb5fb0c05, type: 2}
+  - {fileID: 2100000, guid: 58276d8f45ba54ec095283c961a17be5, type: 2}
+  - {fileID: 2100000, guid: 287db292967004ec0a3e50eb0af48bb7, type: 2}
+  - {fileID: 2100000, guid: db1ed94960fd64e15b0c632b5ed8cd68, type: 2}
+  - {fileID: 2100000, guid: 4380eafe429344a0aa45895125543895, type: 2}
   _towerObject: {fileID: 0}
   _levelTransforms: []
   hitColliders0: []
@@ -73,4 +92,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7ea027fe37ae49ec9f6e82e20819924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _itemHolderPrefab: {fileID: 3744054359383907563, guid: d56be5f38d12f43b0a9bb4327409d457, type: 3}
   _itemPrefab: {fileID: 3561655117392332185, guid: 8e60198daf58c41e4bf8ca1aaf89527d, type: 3}
+  _itemCount: 0

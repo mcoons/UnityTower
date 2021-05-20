@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Item : MonoBehaviour
@@ -8,9 +7,9 @@ public class Item : MonoBehaviour
     [SerializeField] public Vector3 _globalPosition;
 
     public string baseName;
-    public GameManager.ItemType _type = GameManager.ItemType.SPHERE_RED;
+    public TowerManager.ItemType _type = TowerManager.ItemType.SPHERE_RED;
 
-    //public bool beenChecked = false;
+    public bool selected = false;
     public bool matched = false;
 
 
@@ -19,6 +18,13 @@ public class Item : MonoBehaviour
     public Vector3 itemStartPosition;
     public Vector3 itemDesiredPosition;
 
+    public float fadeIn;
+    private IEnumerator fadeInCoroutine;
+
+    public Animation _itemAnimator;
+    public AnimationClip _explodeAnimation;
+
+    public GameObject selector;
 
     // Start is called before the first frame update
     void Start()
@@ -27,20 +33,27 @@ public class Item : MonoBehaviour
 
         EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
 
-        int index = Random.Range(0, 4);
-        if (index == 0)
-            _type = GameManager.ItemType.SPHERE_RED;
-        if (index == 1)
-            _type = GameManager.ItemType.SPHERE_GREEN;
-        if (index == 2)
-            _type = GameManager.ItemType.SPHERE_BLUE;
-
         SetMaterial();
+        TowerManager.Instance.ChangeTypeCount(_type, 1);
+        TowerManager.Instance.AddToTypeGroup(_type, gameObject);
+
+        fadeInCoroutine = WaitAndFadeIn(fadeIn/4500 + .25f);
+        StartCoroutine(fadeInCoroutine);
+
+    }
+
+    private IEnumerator WaitAndFadeIn(float waitTime)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(waitTime);
+            FadeIn();
+        }
     }
 
     private void Update()
     {
-        if (isDropping)
+        if (isDropping && Time.time >= itemDropStartTime)
         {
             itemObjectLerpDrop();
         }
@@ -48,8 +61,6 @@ public class Item : MonoBehaviour
         transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
         _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
     }
-
-
 
     public void itemObjectLerpDrop()
     {
@@ -64,41 +75,67 @@ public class Item : MonoBehaviour
         {
             isDropping = false;
             transform.position = itemDesiredPosition;
+            TowerManager.Instance.dropCount--;
+            if (TowerManager.Instance.dropCount == 0)
+            {
+                TowerManager.Instance.CheckLoss();
+            }
 
             TowerManager.Instance.getColumnIntersects();
-            transform.SetParent(TowerManager.Instance._levelTransforms[(int)itemDesiredPosition.y]);
+            transform.SetParent(GameObject.Find("Holder (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")").transform);
+            
+            transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
+            _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
         }
-        transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
-        _globalPosition = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
     }
 
-
+    private void FadeIn()
+    {
+        gameObject.GetComponent<MeshRenderer>().enabled = true;
+    }
 
     private void OnMouseUpAsButton()
     {
+        //TODO convert to dynamic sizable x,y,z
+        // Only allow front row to bw selected
         if (_globalPosition.z >= 0)
             return;
+
         if (TowerManager.Instance.TowerInRotation())
             return;
         if (TowerManager.Instance.areLevelsInRotation())
             return;
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
             return;
+        if (TowerManager.Instance.dropCount != 0)
+            return;
 
-        if (matched == true)
+
+
+        if (matched == true && TowerManager.Instance.matchCount > 1)
         {
+            _itemAnimator.Stop();
+            _itemAnimator.clip = _explodeAnimation;
+            _itemAnimator.Play();
             TowerManager.Instance.RemoveMatches();
-            TowerManager.Instance.PrepareItemDrop();
+            TowerManager.Instance.PrepareItemDrop("match");
+            if (TowerManager.Instance.dropCount == 0)
+            {
+                TowerManager.Instance.CheckLoss();
+            }
+            TowerManager.Instance.CheckWin();
+
         }
         else
             HandleOnObjectSelected(transform.name, _type, _globalPosition);
     }
 
-    private void HandleOnObjectSelected(string sender, GameManager.ItemType type, Vector3 gPosition)
+    private void HandleOnObjectSelected(string sender, TowerManager.ItemType type, Vector3 gPosition)
     {
 
         TowerManager.Instance.ClearItemStates();
 
+        selected = true;
         matched = true;
         TowerManager.Instance.matchCount++;
         transform.GetChild(0).gameObject.SetActive(true);
@@ -106,10 +143,11 @@ public class Item : MonoBehaviour
 
     }
 
-    public void HandleOnObjectMatched(string sender, GameManager.ItemType type, Vector3 gPosition)
+    public void HandleOnObjectMatched(string sender, TowerManager.ItemType type, Vector3 gPosition)
     {
         if (matched)
             return;
+
         if (Vector3.Distance(gPosition, _globalPosition) > 1.05)
             return;
 
@@ -126,7 +164,8 @@ public class Item : MonoBehaviour
 
     private void SetMaterial()
     {
-        GetComponent<Renderer>().material = GameManager.Instance._materials[(int)_type];
+        GetComponent<Renderer>().material = TowerManager.Instance._itemMaterials[(int)_type];
+        selector.GetComponent<Renderer>().material = TowerManager.Instance._selectorMaterials[(int)_type];
     }
 
     private void OnDestroy()

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
@@ -16,9 +14,14 @@ public class MainMenu : MonoBehaviour
 
     //public Events.EventFadeComplete OnMainMenuFadeComplete;
 
+    public GameObject txt;
+
     private void Start()
     {
         EventManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChanged);
+        txt.GetComponent<UnityEngine.UI.Text>().text =
+    "Can you solve\n the Tower of Puzzles?\nLevel " +
+    GameManager.Instance.levelSeed.ToString() + "\n" + GameManager.Instance._masterTypeCount.ToString() + " Types";
     }
 
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
@@ -26,15 +29,19 @@ public class MainMenu : MonoBehaviour
         if ( (previousState == GameManager.GameState.PREGAME && currentState == GameManager.GameState.RUNNING))
             FadeOut();
 
-        if (previousState != GameManager.GameState.PREGAME && currentState == GameManager.GameState.PREGAME )
+        if (previousState != GameManager.GameState.PREGAME && currentState == GameManager.GameState.PREGAME)
+        {
+            txt.GetComponent<UnityEngine.UI.Text>().text =
+                "Can you solve\n the Tower of Puzzles?\nLevel " +
+                GameManager.Instance.levelSeed.ToString() + "\n" + GameManager.Instance._masterTypeCount.ToString() + " Types";
             FadeIn();
+        }
     }
 
     public void OnFadeOutComplete()
     {
         EventManager.Instance.OnMainMenuFadeComplete.Invoke(true);
     }
-
 
     public void OnFadeInComplete()
     {

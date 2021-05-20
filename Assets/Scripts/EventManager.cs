@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,15 +12,25 @@ public class CustomEvents
     [System.Serializable] public class EventLevelAnimationStart : UnityEvent { }
     [System.Serializable] public class EventLevelAnimationComplete : UnityEvent { }
 
-    [System.Serializable] public class EventObjectSelected : UnityEvent<string, GameManager.ItemType, Vector3> { }
-    [System.Serializable] public class EventObjectMatched : UnityEvent<string, GameManager.ItemType, Vector3> { }
+    [System.Serializable] public class EventObjectCountChange : UnityEvent<TowerManager.ItemType, int> { }
+
+    [System.Serializable] public class EventObjectSelected : UnityEvent<string, TowerManager.ItemType, Vector3> { }
+    [System.Serializable] public class EventObjectMatched : UnityEvent<string, TowerManager.ItemType, Vector3> { }
     [System.Serializable] public class EventUnselectAll : UnityEvent { }
     [System.Serializable] public class EventObjectsRemoved : UnityEvent { }
+
+
+    [System.Serializable] public class EventObjectDropStart : UnityEvent { }
+    [System.Serializable] public class EventObjectDropComplete : UnityEvent { }
+
+    [System.Serializable] public class EventGameLoss : UnityEvent { }
+    [System.Serializable] public class EventGameWon : UnityEvent { }
+
+
 }
 
 public class EventManager : Singleton<EventManager>
 {
-
     // GameManager
     public CustomEvents.EventGameState OnGameStateChanged;
 
@@ -30,6 +38,7 @@ public class EventManager : Singleton<EventManager>
     public CustomEvents.EventFadeComplete OnMainMenuFadeComplete;
 
     // Item
+    public CustomEvents.EventObjectCountChange OnObjectCountChange;
     public CustomEvents.EventObjectSelected OnObjectSelected;
     public CustomEvents.EventObjectMatched OnObjectMatched;
 
@@ -44,12 +53,17 @@ public class EventManager : Singleton<EventManager>
     public CustomEvents.EventLevelAnimationStart OnLevelAnimationStart;
     public CustomEvents.EventLevelAnimationComplete OnLevelAnimationComplete;
 
+    public CustomEvents.EventObjectDropStart OnObjectDropStart;
+    public CustomEvents.EventObjectDropStart OnObjectDropComplete;
+
+
+    public CustomEvents.EventGameLoss OnGameLoss;
+    public CustomEvents.EventGameLoss OnGameWin;
 
     void Start()
     {
         DontDestroyOnLoad(gameObject);
     }
-
 
     protected override void OnDestroy()
     {

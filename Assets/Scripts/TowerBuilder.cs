@@ -1,16 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TowerBuilder : Singleton<TowerBuilder>
 {
-
-    //GameObject _tower;
-    //GameObject _level;
-    //GameObject _itemHolder;
+    public GameObject _itemHolderPrefab;
     public GameObject _itemPrefab;
-    //GameObject _selector;
+    public int _itemCount = 0;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -20,34 +17,32 @@ public class TowerBuilder : Singleton<TowerBuilder>
 
     GameObject ConstructItem(int x, int y, int z)
     {
-        GameObject _itemParent;
-        GameObject _item;
+        GameObject itemParent;
+        GameObject item;
 
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Main"));
 
-
         // create an item parent (Holder)
-        _itemParent = new GameObject("Holder (" + x + "," + y +"," + z + ")");
-        _itemParent.AddComponent<NameSelf>();
-        _itemParent.GetComponent<NameSelf>().baseName = "Holder";
-        _itemParent.transform.position = new Vector3(0, 0, 0);
-        _itemParent.transform.rotation = Quaternion.identity;
+        itemParent = Instantiate(_itemHolderPrefab);
+        itemParent.transform.position = new Vector3(0, 0, 0);
+        itemParent.transform.rotation = Quaternion.identity;
 
         // instantiate an item prefab
-        _item = Instantiate(_itemPrefab);
-        _item.AddComponent<NameSelf>();
-        _item.GetComponent<NameSelf>().baseName = "Item";
-        _item.transform.position = new Vector3(0, 0, 0);
-        _item.transform.rotation = Quaternion.identity;
-        _item.name = "Item (" + x + "," + y + "," + z + ")";
+        item = Instantiate(_itemPrefab);
+        item.AddComponent<NameSelf>();
+        item.GetComponent<NameSelf>().baseName = "Item";
+        item.transform.position = new Vector3(0, 0, 0);
+        item.transform.rotation = Quaternion.identity;
+        item.name = "Item (" + x + "," + y + "," + z + ")";
+        item.GetComponent<Item>().fadeIn = _itemCount * 100 + 100;
+        item.GetComponent<Item>()._type = (TowerManager.ItemType) ItemManager.Instance.GetItem();
 
         // add to item parent
-        _item.transform.SetParent(_itemParent.transform);
+        item.transform.SetParent(itemParent.transform);
 
-
-        return _itemParent;
+        _itemCount++;
+        return itemParent;
     }
-
 
     GameObject ConstructLevel(int xWidth, int level, int zWidth)
     {
@@ -116,7 +111,5 @@ public class TowerBuilder : Singleton<TowerBuilder>
         return _towerParent;
 
     }
-
-
 
 }

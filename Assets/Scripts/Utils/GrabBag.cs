@@ -20,14 +20,14 @@ public class GrabBag
 	int defaultDups = 1;
 
 	// Property access methods
-	public int 		getMin()	{ return defaultMin; }
+	public int 		getMin()		{ return defaultMin; }
 	public void 	setMin(int x) 	{ defaultMin = x; }
-	public int 		getMax()	{ return defaultMax; }
+	public int 		getMax()		{ return defaultMax; }
 	public void 	setMax(int x) 	{ defaultMax = x; }
-	public int 		getDups()	{ return defaultDups; }
+	public int 		getDups()		{ return defaultDups; }
 	public void 	setDups(int x)	{ defaultDups = x; }
-	public int 		getSize()	{ return bagList.Count;	}
-	public void 	emptyBag()	{ bagList.Clear ();	}
+	public int 		getSize()		{ return bagList.Count;	}
+	public void 	emptyBag()		{ bagList.Clear ();	}
 	public string	showBag()
 	{
 		string retVal = "";

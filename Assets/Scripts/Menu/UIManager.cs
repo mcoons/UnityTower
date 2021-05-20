@@ -1,18 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UIManager : Singleton<UIManager>
 {
 
     [SerializeField] private MainMenu _mainMenu;
-
     [SerializeField] private Camera _dummyCamera;
-
     [SerializeField] private PauseMenu _pauseMenu;
-
     [SerializeField] private PlayMenu _playMenu;
+    [SerializeField] private LossMenu _lossMenu;
+    [SerializeField] private OptionsMenu _optionsMenu;
+    [SerializeField] private WinMenu _winMenu;
 
     //public Events.EventFadeComplete OnMainMenuFadeComplete;
 
@@ -27,6 +25,10 @@ public class UIManager : Singleton<UIManager>
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
     {
         _pauseMenu.gameObject.SetActive(currentState == GameManager.GameState.PAUSED);
+        _playMenu.gameObject.SetActive(currentState != GameManager.GameState.PREGAME);
+        _lossMenu.gameObject.SetActive(currentState == GameManager.GameState.LOSS);
+        _winMenu.gameObject.SetActive(currentState == GameManager.GameState.WIN);
+        _optionsMenu.gameObject.SetActive(currentState == GameManager.GameState.OPTIONS);
     }
 
     void HandleMainMenuFadeComplete(bool fadeOut)
