@@ -2,12 +2,6 @@
 
 public class MainMenu : MonoBehaviour
 {
-
-    // Track animation components
-    // Track animation clips for fade in/out
-    // Function that can receive animation events
-    // Functions to play fade in/out animations
-
     [SerializeField] private Animation _mainMenuAnimator;
     [SerializeField] private AnimationClip _fadeOutAnimation;
     [SerializeField] private AnimationClip _fadeInAnimation;
@@ -20,8 +14,9 @@ public class MainMenu : MonoBehaviour
     {
         EventManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChanged);
         txt.GetComponent<UnityEngine.UI.Text>().text =
-    "Can you solve\n the Tower of Puzzles?\nLevel " +
-    GameManager.Instance.levelSeed.ToString() + "\n" + GameManager.Instance._masterTypeCount.ToString() + " Types";
+            "Can you master\n the \nTower of Puzzles?\n\n" +
+            "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
+            "Tower " + GameManager.Instance.levelSeed.ToString();
     }
 
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
@@ -32,8 +27,9 @@ public class MainMenu : MonoBehaviour
         if (previousState != GameManager.GameState.PREGAME && currentState == GameManager.GameState.PREGAME)
         {
             txt.GetComponent<UnityEngine.UI.Text>().text =
-                "Can you solve\n the Tower of Puzzles?\nLevel " +
-                GameManager.Instance.levelSeed.ToString() + "\n" + GameManager.Instance._masterTypeCount.ToString() + " Types";
+                "Can you master\n the \nTower of Puzzles?\n\n" +
+            "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
+            "Tower " + GameManager.Instance.levelSeed.ToString();
             FadeIn();
         }
     }

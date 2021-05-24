@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LossMenu : MonoBehaviour
+public class ColorsMenu : MonoBehaviour
 {
+
     [SerializeField] private Text _tagline;
-    [SerializeField] private Button _optionsButton;
+    [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _nextButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _quitButton;
 
     private void Start()
     {
-        _optionsButton.onClick.AddListener(HandleOptionsClicked);
+        _resumeButton.onClick.AddListener(HandleResumeClicked);
         _nextButton.onClick.AddListener(HandleNextClicked);
         _restartButton.onClick.AddListener(HandleRestartClicked);
         _quitButton.onClick.AddListener(HandleQuitClicked);
-
     }
 
     private void OnEnable()
@@ -27,12 +27,6 @@ public class LossMenu : MonoBehaviour
             "Tower " + GameManager.Instance.levelSeed.ToString();
     }
 
-    void HandleOptionsClicked()
-    {
-        //TODO: Turn to messaging
-        Debug.Log("Options Clicked");
-        GameManager.Instance.OnOptions();
-    }
 
     void HandleNextClicked()
     {
@@ -41,6 +35,12 @@ public class LossMenu : MonoBehaviour
         GameManager.Instance._masterTypeCount = Mathf.Min(3 + (int)(GameManager.Instance.levelSeed / 5), 7);
 
         GameManager.Instance.RestartGame();
+    }
+
+    void HandleResumeClicked()
+    {
+        //TODO: Turn to messaging
+        GameManager.Instance.TogglePause();
     }
 
     void HandleRestartClicked()
@@ -54,6 +54,9 @@ public class LossMenu : MonoBehaviour
         //TODO: Turn to messaging
         GameManager.Instance.QuitGame();
     }
+
+
+
 
 
 }

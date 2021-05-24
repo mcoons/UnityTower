@@ -12,12 +12,13 @@ public class CustomEvents
     [System.Serializable] public class EventLevelAnimationStart : UnityEvent { }
     [System.Serializable] public class EventLevelAnimationComplete : UnityEvent { }
 
-    [System.Serializable] public class EventObjectCountChange : UnityEvent<TowerManager.ItemType, int> { }
+    //[System.Serializable] public class EventObjectCountChange : UnityEvent<TowerManager.ItemType, int> { }
+    [System.Serializable] public class EventObjectAdded : UnityEvent<TowerManager.ItemType, GameObject> { }
 
     [System.Serializable] public class EventObjectSelected : UnityEvent<string, TowerManager.ItemType, Vector3> { }
     [System.Serializable] public class EventObjectMatched : UnityEvent<string, TowerManager.ItemType, Vector3> { }
     [System.Serializable] public class EventUnselectAll : UnityEvent { }
-    [System.Serializable] public class EventObjectsRemoved : UnityEvent { }
+    [System.Serializable] public class EventObjectRemoved : UnityEvent { }
 
 
     [System.Serializable] public class EventObjectDropStart : UnityEvent { }
@@ -29,6 +30,10 @@ public class CustomEvents
 
 }
 
+//** usage examples **//
+// EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
+// EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
+
 public class EventManager : Singleton<EventManager>
 {
     // GameManager
@@ -38,23 +43,24 @@ public class EventManager : Singleton<EventManager>
     public CustomEvents.EventFadeComplete OnMainMenuFadeComplete;
 
     // Item
-    public CustomEvents.EventObjectCountChange OnObjectCountChange;
+    public CustomEvents.EventObjectAdded OnObjectAdded;
+    //public CustomEvents.EventObjectCountChange OnObjectCountChange;
     public CustomEvents.EventObjectSelected OnObjectSelected;
     public CustomEvents.EventObjectMatched OnObjectMatched;
 
     // TODO
-    public CustomEvents.EventUnselectAll OnUnselectAll;
-    public CustomEvents.EventObjectsRemoved OnObjectsRemoved;
+    //public CustomEvents.EventUnselectAll OnUnselectAll;
+    public CustomEvents.EventObjectRemoved OnObjectRemoved;
 
     // TowerManager
-    public CustomEvents.EventTowerAnimationStart OnTowerAnimationStart;
-    public CustomEvents.EventTowerAnimationComplete OnTowerAnimationComplete;
+    //public CustomEvents.EventTowerAnimationStart OnTowerAnimationStart;
+    //public CustomEvents.EventTowerAnimationComplete OnTowerAnimationComplete;
 
-    public CustomEvents.EventLevelAnimationStart OnLevelAnimationStart;
-    public CustomEvents.EventLevelAnimationComplete OnLevelAnimationComplete;
+    //public CustomEvents.EventLevelAnimationStart OnLevelAnimationStart;
+    //public CustomEvents.EventLevelAnimationComplete OnLevelAnimationComplete;
 
-    public CustomEvents.EventObjectDropStart OnObjectDropStart;
-    public CustomEvents.EventObjectDropStart OnObjectDropComplete;
+    //public CustomEvents.EventObjectDropStart OnObjectDropStart;
+    public CustomEvents.EventObjectDropComplete OnObjectDropComplete;
 
 
     public CustomEvents.EventGameLoss OnGameLoss;

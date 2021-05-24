@@ -6,9 +6,9 @@ using UnityEngine;
 public class TowerManager : Singleton<TowerManager>
 {
     [SerializeField] public int towerLength = 3;
-    [SerializeField] public int towerWidth = 3;
+    [SerializeField] public int towerWidth  = 3;
     [SerializeField] public int towerHeight = 6;
-    //[SerializeField] public int gemTypeCount;
+
     public bool gameLost = false;
     public bool gameWon = false;
 
@@ -23,20 +23,21 @@ public class TowerManager : Singleton<TowerManager>
         SPHERE_VIOLET
     }
 
+    public List<Color> ItemColors = new List<Color>();
+
 
     [SerializeField] public List<int> typeCounts = new List<int>();
     [SerializeField] public List<List<GameObject>> typeGroups = new List<List<GameObject>>();
 
     public Material[] _itemMaterials;
     public Material[] _selectorMaterials;
-
-    //public GameObject TowerPrefab;
-    [SerializeField] private GameObject _towerObject;
-    //[SerializeField] private Transform[] _levelTransforms = new Transform[towerHeight];
-    public List<Transform> _levelTransforms = new List<Transform>();
-
+    public int dropCount = 0;				// Current count of objects dropping
+    public int matchCount = 0;
 
     //TODO convert to dynamic sizable x,y,z
+    //[SerializeField] public List<Collider[]> hitColliders = new List<Collider[]>();
+
+
     [SerializeField] Collider[] hitColliders0;
     [SerializeField] Collider[] hitColliders1;
     [SerializeField] Collider[] hitColliders2;
@@ -48,15 +49,17 @@ public class TowerManager : Singleton<TowerManager>
     [SerializeField] Collider[] hitColliders8;
 
 
-    #region Level Rotation Variables
+    [SerializeField] private GameObject _towerObject;
+    public List<Transform> _levelTransforms = new List<Transform>();
+
+    #region Rotation Variables
 
     public List<bool> isLevelInRotation = new List<bool>();
     List<float> levelRotationStartTime = new List<float>();
     List<Quaternion> levelStartRotation = new List<Quaternion>();
     List<Quaternion> levelDesiredRotation = new List<Quaternion>();
 
-    public int dropCount = 0;				// Current count of objects dropping
-    public int matchCount = 0;
+
 
     private IEnumerator delayDestroyCoroutine;
 
@@ -100,10 +103,14 @@ public class TowerManager : Singleton<TowerManager>
         
     //}
 
-
-    // Start is called before the first frame update
     void Start()
     {
+        EventManager.Instance.OnObjectAdded.AddListener(HandleOnObjectAdded);
+        EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
+        EventManager.Instance.OnObjectRemoved.AddListener(HandleOnObjectRemoved);
+        EventManager.Instance.OnObjectSelected.AddListener(HandleOnObjectSelected);
+        EventManager.Instance.OnObjectDropComplete.AddListener(HandleObjectDropComplete);
+
         ItemManager.Instance.initBag();
         _towerObject = TowerBuilder.Instance.ConstructTower(towerLength, towerHeight, towerWidth);
 
@@ -124,8 +131,67 @@ public class TowerManager : Singleton<TowerManager>
         }
 
 
-        UpdateGemTypeCount(GameManager.Instance._masterTypeCount);
+        //hitColliders.Clear();
+        //for (int zIndex = -(int)(towerWidth / 2); zIndex <= (int)(towerWidth / 2); zIndex++)
+        //{
+        //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
+        //    {
 
+        //        Collider[] c =  Physics.OverlapBox(new Vector3(xIndex, 0, zIndex), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
+        //        hitColliders.Add(c);
+
+        //    }
+
+        //}
+
+
+
+
+          UpdateGemTypeCount(GameManager.Instance._masterTypeCount);
+
+    }
+
+    public void HandleObjectDropComplete()
+    {
+        dropCount--;
+        if (dropCount == 0)
+        {
+            CheckLoss();
+        }
+        getColumnIntersects();
+    }
+
+    public void HandleOnObjectMatched(string sender, TowerManager.ItemType type, Vector3 gPosition)
+    {
+        TowerManager.Instance.matchCount++;
+    }
+
+    private void HandleOnObjectAdded(ItemType type, GameObject go)
+    {
+        ChangeTypeCount(type, 1);
+        AddToTypeGroup(type, go);
+    }
+
+    private void HandleOnObjectRemoved()
+    {
+        CalculateScore();
+        RemoveMatches();
+        PrepareItemDrop("match");
+        if (dropCount == 0)
+        {
+            CheckLoss();
+        }
+        CheckWin();
+    }
+
+    private void HandleOnObjectSelected(string sender, TowerManager.ItemType type, Vector3 gPosition)
+    {
+
+    }
+
+    public void CalculateScore()
+    {
+        GameManager.Instance.levelScore += (int)Mathf.Pow(2.0f, (float)TowerManager.Instance.matchCount);
     }
 
     public void UpdateGemTypeCount(int newCount)
@@ -142,6 +208,24 @@ public class TowerManager : Singleton<TowerManager>
 
     public void getColumnIntersects()
     {
+
+        //hitColliders.Clear();
+        //int index = 0;
+        //for (int zIndex = -(int)(towerWidth / 2); zIndex <= (int)(towerWidth / 2); zIndex++)
+        //{
+        //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
+        //    {
+
+        //        Collider[] c = Physics.OverlapBox(new Vector3(xIndex, 0, zIndex), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
+        //        hitColliders.Add(c);
+        //        Array.Sort(hitColliders[index], delegate (Collider c1, Collider c2) {
+        //            return c1.transform.position.y.CompareTo(c2.transform.position.y);
+        //        });
+        //        index++;
+        //    }
+
+        //}
+
         //TODO convert to dynamic sizable x,y,z
         hitColliders0 = Physics.OverlapBox(new Vector3(-1, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
         hitColliders1 = Physics.OverlapBox(new Vector3(0, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
@@ -156,40 +240,49 @@ public class TowerManager : Singleton<TowerManager>
 
         //TODO convert to dynamic sizable x,y,z - loop this
 
-        Array.Sort(hitColliders0, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders0, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders1, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders1, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders2, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders2, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders3, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders3, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders4, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders4, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders5, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders5, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders6, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders6, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders7, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders7, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
-        Array.Sort(hitColliders8, delegate (Collider c1, Collider c2) {
-            return c1.transform.position.y.CompareTo(c2.transform.position.y); 
+        Array.Sort(hitColliders8, delegate (Collider c1, Collider c2)
+        {
+            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         });
 
     }
@@ -229,29 +322,6 @@ public class TowerManager : Singleton<TowerManager>
 
 
 
-    public bool CheckLoss()
-    {
-        Debug.Log("In CheckEndGame");
-        for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
-        {
-            // Any single Type alone
-
-            if (typeCounts[i] == 1) gameLost = true;
-
-            // all in the center column
-
-            // all in the center column and corner columns
-
-            // all on bottom and not neighbors
-
-             
-        }
-
-        if (gameLost) EventManager.Instance.OnGameLoss.Invoke();
-        return gameLost;
-
-    }
-
     public bool CheckWin()
     {
         if (getItemCount() == 0) gameWon = true;
@@ -260,6 +330,81 @@ public class TowerManager : Singleton<TowerManager>
 
         return gameWon;
     }
+
+
+    public bool CheckLoss()
+    {
+        Debug.Log("In CheckEndGame");
+        for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
+        {
+            // Any single Type alone
+
+            //if (typeCounts[i] == 1) gameLost = true;
+            gameLost = gameLost || IsLoneSurvivor((TowerManager.ItemType) i);
+
+            // all in the center column
+            //gameLost = gameLost || AreAllCenter((TowerManager.ItemType) i);
+
+            // all in the center column and corner columns
+
+            // all on bottom and not neighbors
+
+
+        }
+
+
+        if (gameLost) EventManager.Instance.OnGameLoss.Invoke();
+        return gameLost;
+
+    }
+
+
+    bool IsLoneSurvivor(TowerManager.ItemType itemType)
+    {
+        bool retval = false;
+
+        if (typeCounts[(int)itemType] == 1) retval = true;
+
+        return retval;
+    }
+
+
+    bool AreAllCenter(TowerManager.ItemType itemType)
+    {
+        bool retval = true;
+
+        foreach (GameObject go in typeGroups[(int)itemType])
+        {
+            if (!(go.transform.position.x == 0 && go.transform.position.y == 0))
+            {
+                retval = false;
+                return retval;
+            }
+        }
+
+        return retval;
+    }
+
+    bool AreAllCenterCorner(TowerManager.ItemType itemType)
+    {
+        bool retval = false;
+
+
+
+        return retval;
+    }
+
+
+    bool AreAllLonelyBottomDwellers(TowerManager.ItemType itemType)
+    {
+        bool retval = false;
+
+
+
+        return retval;
+    }
+
+
 
     /**********************************/
     /*      Tower/Level Methods       */
@@ -377,6 +522,15 @@ public class TowerManager : Singleton<TowerManager>
     {
         getColumnIntersects();
 
+        //int index = 0;
+        //for (int zIndex = -(int)(towerWidth / 2); zIndex <= (int)(towerWidth / 2); zIndex++)
+        //{
+        //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
+        //    {
+        //        PrepareColumnDrop(hitColliders[index], from);
+        //    }
+        //}
+
         //TODO convert to dynamic sizable x,y,z - combine these into the same loop
         PrepareColumnDrop(hitColliders0, from);
         PrepareColumnDrop(hitColliders1, from);
@@ -429,7 +583,7 @@ public class TowerManager : Singleton<TowerManager>
                 go.GetComponent<Item>()._itemAnimator.clip = go.GetComponent<Item>()._explodeAnimation;
                 go.GetComponent<Item>()._itemAnimator.Play();
             }
-
+        matchCount = 0;
     }
 
     private IEnumerator WaitAndDestroy(GameObject go)
@@ -458,6 +612,13 @@ public class TowerManager : Singleton<TowerManager>
     protected override void OnDestroy()
     {
         base.OnDestroy();
+
+        EventManager.Instance.OnObjectAdded.RemoveListener(HandleOnObjectAdded);
+        EventManager.Instance.OnObjectMatched.RemoveListener(HandleOnObjectMatched);
+        EventManager.Instance.OnObjectRemoved.RemoveListener(HandleOnObjectRemoved);
+        EventManager.Instance.OnObjectSelected.RemoveListener(HandleOnObjectSelected);
+        EventManager.Instance.OnObjectDropComplete.RemoveListener(HandleObjectDropComplete);
+
         _levelTransforms.Clear();
         Destroy(_towerObject);
     }

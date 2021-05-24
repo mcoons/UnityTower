@@ -16,9 +16,14 @@ public class GameManager : Singleton<GameManager>
         RUNNING,
         PAUSED,
         OPTIONS,
+        COLORSELECTION,
         WIN,
         LOSS
     }
+
+    public int totalScore = 0;
+    public int levelScore = 0;
+
 
     public GameObject[] SystemPrefabs;  // list of system prefabs to load that live in the scope of boot
     private List<GameObject> _instancedSystemPrefabs;  // list of which SystemPrefabs have been instanced
@@ -54,7 +59,12 @@ public class GameManager : Singleton<GameManager>
         if (_currentGameState == GameState.PREGAME)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) /* &&
+            (_currentGameState == GameState.RUNNING ||
+            _currentGameState == GameState.PAUSED ||
+            _currentGameState == GameState.OPTIONS ||
+            _currentGameState == GameState.COLORSELECTION)*/
+            )
             TogglePause();
     }
 
@@ -95,6 +105,7 @@ public class GameManager : Singleton<GameManager>
             case GameState.PREGAME:
                 Debug.Log("Pre Game");
 
+                GameManager.Instance.levelScore = 0;
                 Time.timeScale = 1.0f;
                 break;
 
@@ -109,14 +120,24 @@ public class GameManager : Singleton<GameManager>
                 Time.timeScale = 0.0f;
                 break;
 
+            case GameState.OPTIONS:
+                Debug.Log("Options Menu");
+                Time.timeScale = 0.0f;
+                break;
+
+            case GameState.COLORSELECTION:
+                Debug.Log("Colors Menu");
+                Time.timeScale = 0.0f;
+                break;
+
             case GameState.WIN:
                 Debug.Log("Game Won");
-                Time.timeScale = 0.75f;
+                Time.timeScale = 1.0f;
                 break;
 
             case GameState.LOSS:
                 Debug.Log("Game Lost");
-                Time.timeScale = 0.75f;
+                Time.timeScale = 1.0f;
                 break;
             default:
 
@@ -152,7 +173,7 @@ public class GameManager : Singleton<GameManager>
         // used to track active load operations 
         _loadOperations.Add(ao);
 
-        Debug.Log("Adding Load Operation for " + levelName);
+        Debug.Log("[Game Manager] Adding Load Operation for " + levelName);
 
         // add the event listener
         ao.completed += OnLoadOperationComplete;
@@ -171,7 +192,7 @@ public class GameManager : Singleton<GameManager>
         // used to track active load operations
         _loadOperations.Add(ao);
 
-        Debug.Log("Adding UNLoad Operation for " + levelName);
+        Debug.Log("[Game Manager] Adding UNLoad Operation for " + levelName);
 
 
         // add the event listener
@@ -187,6 +208,10 @@ public class GameManager : Singleton<GameManager>
             Destroy(_instancedSystemPrefabs[i]);
 
         _instancedSystemPrefabs.Clear();
+
+        EventManager.Instance.OnMainMenuFadeComplete.RemoveListener(HandleMainMenuFadeComplete);
+        EventManager.Instance.OnGameLoss.RemoveListener(OnGameLoss);
+        EventManager.Instance.OnGameWin.RemoveListener(OnGameWin);
     }
 
     public void StartGame()
@@ -196,12 +221,53 @@ public class GameManager : Singleton<GameManager>
 
     public void TogglePause()
     {
-        UpdateState(_currentGameState == GameState.RUNNING ? GameState.PAUSED : GameState.RUNNING);
+        //UpdateState(_currentGameState == GameState.RUNNING ? GameState.PAUSED : GameState.RUNNING);
+        if (_currentGameState == GameState.PAUSED)
+        {
+            UpdateState(GameState.RUNNING);
+        }
+        else
+        
+        if (_currentGameState == GameState.RUNNING && TowerManager.Instance.gameWon)
+        {
+            UpdateState(GameState.WIN);
+        }
+
+        else
+        if (_currentGameState == GameState.RUNNING && TowerManager.Instance.gameLost)
+        {
+            UpdateState(GameState.LOSS);
+        }
+        else
+        if (_currentGameState == GameState.RUNNING )
+        {
+            UpdateState(GameState.PAUSED);
+        }
+        else
+        if (_currentGameState == GameState.OPTIONS)
+        {
+            UpdateState(GameState.PAUSED);
+        }
+        else
+        if (_currentGameState == GameState.COLORSELECTION)
+        {
+            UpdateState(GameState.OPTIONS);
+        }
+        else
+        if (_currentGameState == GameState.WIN || _currentGameState == GameState.LOSS)
+        {
+            UpdateState(GameState.RUNNING);
+        }
     }
 
     public void OnOptions()
     {
         UpdateState(GameState.OPTIONS);
+    }
+
+    public void OnColorSelection()
+    {
+        UpdateState(GameState.COLORSELECTION);
     }
 
     public void RestartGame()

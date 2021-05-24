@@ -7,6 +7,10 @@ public class PlayMenu : MonoBehaviour
     [SerializeField] private AnimationClip _fadeOutAnimation;
     [SerializeField] private AnimationClip _fadeInAnimation;
 
+    [SerializeField] private Text scoreText;
+    [SerializeField] private Text selectedText;
+
+
     //TODO convert to dynamic sizable x,y,z
     [SerializeField] private Button LeftLevel5;
     [SerializeField] private Button LeftLevel4;
@@ -25,6 +29,8 @@ public class PlayMenu : MonoBehaviour
 
     [SerializeField] private Button RightTower;
     [SerializeField] private Button LeftTower;
+
+    [SerializeField] private Button Clear;
 
     [SerializeField] private GameObject _buttonPanel;
 
@@ -56,6 +62,8 @@ public class PlayMenu : MonoBehaviour
         LeftTower.onClick.AddListener(delegate { HandleTowerRotationClicked(-1); });
         RightTower.onClick.AddListener(delegate { HandleTowerRotationClicked(1); });
 
+        Clear.onClick.AddListener(HandleClearClicked);
+
 
         EventManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChanged);
         //EventManager.Instance.OnPlayMenuFadeComplete.AddListener(OnFadeOutComplete);
@@ -63,6 +71,14 @@ public class PlayMenu : MonoBehaviour
 
     private void Update()
     {
+        if (!(GameManager.Instance.CurrentGameState == GameManager.GameState.RUNNING ||
+              GameManager.Instance.CurrentGameState == GameManager.GameState.WIN ||
+              GameManager.Instance.CurrentGameState == GameManager.GameState.LOSS ))
+            return;
+
+        scoreText.text = GameManager.Instance.levelScore.ToString();
+        selectedText.text = TowerManager.Instance.matchCount.ToString() + " Selected";
+
         countRed.text = TowerManager.Instance.typeCounts[0].ToString();
         countGreen.text = TowerManager.Instance.typeCounts[1].ToString();
         countBlue.text = TowerManager.Instance.typeCounts[2].ToString();
@@ -72,11 +88,23 @@ public class PlayMenu : MonoBehaviour
         countViolet.text = TowerManager.Instance.typeCounts[6].ToString();
     }
 
+    public void HandleClearClicked()
+    {
+        if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
+            return;
+        if (TowerManager.Instance.dropCount != 0)
+            return;
+
+        TowerManager.Instance.ClearItemStates();
+    }
+
     public void HandleLevelRotationClicked(int level, int direction)
     {
         if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
             return;
         if (TowerManager.Instance.dropCount != 0)
+            return;
+        if (TowerManager.Instance.gameLost || TowerManager.Instance.gameWon)
             return;
 
         TowerManager.Instance.RotateLevel(level, direction);

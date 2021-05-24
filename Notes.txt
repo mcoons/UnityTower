@@ -1,73 +1,93 @@
 ﻿
-Clean and Optimize
+*** BUGS/TODO ***  Clean and Optimize Always
+
+Add more messaging when no timing/ordering issue
+Review Messaging logic for timing issues
 
 Clean unnecessary SerializedFields/permissions
-
 Change all data types to be dynamic for tower sizes
 
-Review Messaging logic for timing issues
+Add Text to UI Manager
+- Make it clear to see tower outcome EoG
+- Selected
+- Score
+- Timer
 
 Add audio
     Rotation
     Explosion
     Win
     Loss
-
-Tower Build sound?
-
-Validate Tables upon build
-
-Add Text to UI Manager
-    Selected
-    Score
-    Timer
+    Tower Build sound?
 
 Add isGameOver() Logic
-    Any two in the center column and a corner column
-    Any two both on layer 0 and not neighbors
+Validate Tables upon build using game over rules
 
 
-Add the ability for color selection for color blind users.
+Add the ability for palette selection for color blind users.
+
+Emission effect not available in WebGL?
+
+--------------------------------------------
+
+*** PLANNING ***
 
 
-Earned Mechanics
+Game Types
+
+Without Dropper/Extinction (dwindling)
+- Clear the board
+- Move these items there
+-
+
+With Dropper/Feeder (replenishment)
+- Timed Levels for points
+- Create a shape and remove it (column, plane, etc.)
+-
+
+Difficulty
+- Increase in types
+- Disable items in a zone from movement
+- Disable items in a zone from selection
+- Decrease count of certain types
+-
+
+Earned Mechanics/PowerUps
 - Explode center
 - Invert tower
+- Diagonal Matching
+- Undo
 
-
-Player Achievements
-- Mass Extention Bonus - Removing all of one type in a 10+ group
+Player Points/Achievements
+- Base points = 2^removedCount + levelModifier
+- Mass Extinction Bonus - Removing all of one type in a 10+ group
 - Full Column Bonus - All 6
 - Partial Column Bonus - 5
 - Row Bonus
 - Plane Bonus
 -
 
-Game Types
-
-Without Dropper (dwindling)
-
-Extinction
 
 
-With Dropper (replenishment)
+DATA
 
-Timed Levels
-Simon Says
+Timer
+Total Score All Time
 
+Current Score this Level
+Current Rotation Count this Level
+Ccurrent Selection/Removal this Level
 
-Difficulty
+Current Counts of each type
+Columns of each type
 
-Increase in types
-Disable items on a level
-
-
-
+Columns of each Selection/Removal
 
 --------------------------------------------
-Multiplayer
+
 User accounts
 
+Multiplayer Games
 Type 1
 
 Single board using constant refill.
@@ -79,9 +99,10 @@ Best of 5
 
 Type 2
 
-Two identical boards using constant refill
+Two identical boards using constant refill or extinction.
 Timed start
 Quickest winner
 Best of 5
 
 
+Only able to select a certain color(s)?

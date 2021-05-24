@@ -9,16 +9,14 @@ public class Item : MonoBehaviour
     public string baseName;
     public TowerManager.ItemType _type = TowerManager.ItemType.SPHERE_RED;
 
+    public float fadeIn;  // pause time used to show tower building at start
     public bool selected = false;
     public bool matched = false;
-
-
     public bool isDropping = false;
     public float itemDropStartTime = 0;
     public Vector3 itemStartPosition;
     public Vector3 itemDesiredPosition;
 
-    public float fadeIn;
     private IEnumerator fadeInCoroutine;
 
     public Animation _itemAnimator;
@@ -34,8 +32,8 @@ public class Item : MonoBehaviour
         EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
 
         SetMaterial();
-        TowerManager.Instance.ChangeTypeCount(_type, 1);
-        TowerManager.Instance.AddToTypeGroup(_type, gameObject);
+
+        EventManager.Instance.OnObjectAdded.Invoke(_type, gameObject);
 
         fadeInCoroutine = WaitAndFadeIn(fadeIn/4500 + .25f);
         StartCoroutine(fadeInCoroutine);
@@ -75,13 +73,20 @@ public class Item : MonoBehaviour
         {
             isDropping = false;
             transform.position = itemDesiredPosition;
-            TowerManager.Instance.dropCount--;
-            if (TowerManager.Instance.dropCount == 0)
-            {
-                TowerManager.Instance.CheckLoss();
-            }
 
-            TowerManager.Instance.getColumnIntersects();
+
+            //TODO send a message
+            EventManager.Instance.OnObjectDropComplete.Invoke();
+
+            //TowerManager.Instance.dropCount--;
+            //if (TowerManager.Instance.dropCount == 0)
+            //{
+            //    TowerManager.Instance.CheckLoss();
+            //}
+            //TowerManager.Instance.getColumnIntersects();
+
+
+
             transform.SetParent(GameObject.Find("Holder (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")").transform);
             
             transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";
@@ -96,20 +101,23 @@ public class Item : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
+        if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
+            return;
+
         //TODO convert to dynamic sizable x,y,z
-        // Only allow front row to bw selected
+        // Only allow front row to be selected
         if (_globalPosition.z >= 0)
             return;
 
+        // Do not allow during animations
         if (TowerManager.Instance.TowerInRotation())
             return;
         if (TowerManager.Instance.areLevelsInRotation())
             return;
-        if (GameManager.Instance.CurrentGameState != GameManager.GameState.RUNNING)
-            return;
         if (TowerManager.Instance.dropCount != 0)
             return;
-
+        if (TowerManager.Instance.gameLost || TowerManager.Instance.gameWon)
+            return;
 
 
         if (matched == true && TowerManager.Instance.matchCount > 1)
@@ -117,13 +125,18 @@ public class Item : MonoBehaviour
             _itemAnimator.Stop();
             _itemAnimator.clip = _explodeAnimation;
             _itemAnimator.Play();
-            TowerManager.Instance.RemoveMatches();
-            TowerManager.Instance.PrepareItemDrop("match");
-            if (TowerManager.Instance.dropCount == 0)
-            {
-                TowerManager.Instance.CheckLoss();
-            }
-            TowerManager.Instance.CheckWin();
+
+
+            //TODO send a message
+            EventManager.Instance.OnObjectRemoved.Invoke();
+
+            //TowerManager.Instance.RemoveMatches();
+            //TowerManager.Instance.PrepareItemDrop("match");
+            //if (TowerManager.Instance.dropCount == 0)
+            //{
+            //    TowerManager.Instance.CheckLoss();
+            //}
+            //TowerManager.Instance.CheckWin();
 
         }
         else
@@ -137,8 +150,8 @@ public class Item : MonoBehaviour
 
         selected = true;
         matched = true;
-        TowerManager.Instance.matchCount++;
         transform.GetChild(0).gameObject.SetActive(true);
+
         EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
 
     }
@@ -156,7 +169,7 @@ public class Item : MonoBehaviour
         if (_type == type)
         {
             matched = true;
-            TowerManager.Instance.matchCount++;
+            //TowerManager.Instance.matchCount++;
             transform.GetChild(0).gameObject.SetActive(true);
             EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
         }

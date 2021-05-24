@@ -10,6 +10,7 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private PlayMenu _playMenu;
     [SerializeField] private LossMenu _lossMenu;
     [SerializeField] private OptionsMenu _optionsMenu;
+    [SerializeField] private ColorsMenu _colorsMenu;
     [SerializeField] private WinMenu _winMenu;
 
     //public Events.EventFadeComplete OnMainMenuFadeComplete;
@@ -29,6 +30,7 @@ public class UIManager : Singleton<UIManager>
         _lossMenu.gameObject.SetActive(currentState == GameManager.GameState.LOSS);
         _winMenu.gameObject.SetActive(currentState == GameManager.GameState.WIN);
         _optionsMenu.gameObject.SetActive(currentState == GameManager.GameState.OPTIONS);
+        _colorsMenu.gameObject.SetActive(currentState == GameManager.GameState.COLORSELECTION);
     }
 
     void HandleMainMenuFadeComplete(bool fadeOut)
