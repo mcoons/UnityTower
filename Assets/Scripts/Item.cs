@@ -126,7 +126,7 @@ public class Item : MonoBehaviour
             _itemAnimator.clip = _explodeAnimation;
             _itemAnimator.Play();
 
-
+            AudioManager.Instance.Explode();
             //TODO send a message
             EventManager.Instance.OnObjectRemoved.Invoke();
 

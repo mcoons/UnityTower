@@ -37,6 +37,7 @@ public class TowerManager : Singleton<TowerManager>
     //TODO convert to dynamic sizable x,y,z
     //[SerializeField] public List<Collider[]> hitColliders = new List<Collider[]>();
 
+    //[SerializeField] public List<Collider[]> columnItems = new List<Collider[]>();
 
     [SerializeField] Collider[] hitColliders0;
     [SerializeField] Collider[] hitColliders1;
@@ -131,23 +132,26 @@ public class TowerManager : Singleton<TowerManager>
         }
 
 
-        //hitColliders.Clear();
-        //for (int zIndex = -(int)(towerWidth / 2); zIndex <= (int)(towerWidth / 2); zIndex++)
+        //columnItems.Clear();
+        //int index = 0;
+        //for (int zIndex = -1; zIndex <= 1; zIndex++)
         //{
-        //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
+        //    for (int xIndex = -1; xIndex <= 1; xIndex++)
         //    {
 
-        //        Collider[] c =  Physics.OverlapBox(new Vector3(xIndex, 0, zIndex), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
-        //        hitColliders.Add(c);
-
+        //        Collider[] c = Physics.OverlapBox(new Vector3(xIndex, 0, zIndex), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
+        //        Array.Sort(c, delegate (Collider c1, Collider c2)
+        //        {
+        //            return c1.transform.position.y.CompareTo(c2.transform.position.y);
+        //        });
+        //        columnItems.Add(c);
+        //        index++;
         //    }
 
         //}
 
 
-
-
-          UpdateGemTypeCount(GameManager.Instance._masterTypeCount);
+        UpdateGemTypeCount(GameManager.Instance._masterTypeCount);
 
     }
 
@@ -209,22 +213,25 @@ public class TowerManager : Singleton<TowerManager>
     public void getColumnIntersects()
     {
 
-        //hitColliders.Clear();
+        //columnItems.Clear();
         //int index = 0;
-        //for (int zIndex = -(int)(towerWidth / 2); zIndex <= (int)(towerWidth / 2); zIndex++)
+        //for (int zIndex = -1; zIndex <= 1; zIndex++)
         //{
-        //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
+        //    for (int xIndex = -1; xIndex <= 1; xIndex++)
         //    {
 
         //        Collider[] c = Physics.OverlapBox(new Vector3(xIndex, 0, zIndex), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
-        //        hitColliders.Add(c);
-        //        Array.Sort(hitColliders[index], delegate (Collider c1, Collider c2) {
+        //        Array.Sort(c, delegate (Collider c1, Collider c2)
+        //        {
         //            return c1.transform.position.y.CompareTo(c2.transform.position.y);
         //        });
+        //        columnItems.Add(c);
         //        index++;
         //    }
 
         //}
+
+
 
         //TODO convert to dynamic sizable x,y,z
         hitColliders0 = Physics.OverlapBox(new Vector3(-1, 0, -1), new Vector3(0.05f, 6f, 0.05f), Quaternion.identity);
@@ -326,7 +333,11 @@ public class TowerManager : Singleton<TowerManager>
     {
         if (getItemCount() == 0) gameWon = true;
 
-        if (gameWon) EventManager.Instance.OnGameWin.Invoke();
+        if (gameWon)
+        {
+            EventManager.Instance.OnGameWin.Invoke();
+            AudioManager.Instance.Win();
+        }
 
         return gameWon;
     }
@@ -334,16 +345,16 @@ public class TowerManager : Singleton<TowerManager>
 
     public bool CheckLoss()
     {
+        gameLost = false;
         Debug.Log("In CheckEndGame");
         for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
         {
             // Any single Type alone
 
-            //if (typeCounts[i] == 1) gameLost = true;
             gameLost = gameLost || IsLoneSurvivor((TowerManager.ItemType) i);
 
             // all in the center column
-            //gameLost = gameLost || AreAllCenter((TowerManager.ItemType) i);
+            //gameLost = gameLost || AreAllCenter((TowerManager.ItemType)i);
 
             // all in the center column and corner columns
 
@@ -353,7 +364,11 @@ public class TowerManager : Singleton<TowerManager>
         }
 
 
-        if (gameLost) EventManager.Instance.OnGameLoss.Invoke();
+        if (gameLost)
+        {
+            EventManager.Instance.OnGameLoss.Invoke();
+            AudioManager.Instance.Loss();
+        }
         return gameLost;
 
     }
@@ -373,12 +388,13 @@ public class TowerManager : Singleton<TowerManager>
     {
         bool retval = true;
 
+        getColumnIntersects();
+
         foreach (GameObject go in typeGroups[(int)itemType])
         {
             if (!(go.transform.position.x == 0 && go.transform.position.y == 0))
             {
                 retval = false;
-                return retval;
             }
         }
 
@@ -432,7 +448,7 @@ public class TowerManager : Singleton<TowerManager>
 
         _towerObject.transform.Rotate(0, 90 * direction, 0, Space.World);
 
-        //AudioFile[(int)SoundQueueIndex.Rotate].Play();
+        AudioManager.Instance.Rotate();
 
     }
 
@@ -477,7 +493,7 @@ public class TowerManager : Singleton<TowerManager>
         // Undo the previous rotation
         _levelTransforms[myLevel].Rotate(0, 90 * direction, 0, Space.World);
 
-        //AudioFile[(int)SoundQueueIndex.Rotate].Play();
+        AudioManager.Instance.Rotate();
     }
 
     // Rotate the level object over time
@@ -527,7 +543,7 @@ public class TowerManager : Singleton<TowerManager>
         //{
         //    for (int xIndex = -(int)(towerLength / 2); xIndex <= (int)(towerLength / 2); xIndex++)
         //    {
-        //        PrepareColumnDrop(hitColliders[index], from);
+        //        PrepareColumnDrop(columnItems[index], from);
         //    }
         //}
 

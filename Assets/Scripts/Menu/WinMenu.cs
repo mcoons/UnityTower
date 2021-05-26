@@ -22,7 +22,8 @@ public class WinMenu : MonoBehaviour
     {
         _tagline.GetComponent<UnityEngine.UI.Text>().text =
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance.levelSeed.ToString();
+            "Tower " + GameManager.Instance.levelSeed.ToString() + "\n\n" +
+            "Press 'Esc' to toggle\nTower view";
     }
 
 

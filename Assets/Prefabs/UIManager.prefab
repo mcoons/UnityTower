@@ -2039,8 +2039,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -107}
-  m_SizeDelta: {x: 200, y: 70}
+  m_AnchoredPosition: {x: 0, y: -145}
+  m_SizeDelta: {x: 200, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8239204288316915317
 CanvasRenderer:
@@ -2083,13 +2083,12 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'X Types
+  m_Text: 'Type X
 
     Tower# Y
 
-    a
 
-    b'
+    Press "Esc" to toggle Tower view'
 --- !u!111 &8317457506799706374
 Animation:
   m_ObjectHideFlags: 0
@@ -2732,7 +2731,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Resume
+  m_Text: Back
 --- !u!1 &2173886154457096157
 GameObject:
   m_ObjectHideFlags: 0
@@ -4033,6 +4032,22 @@ MonoBehaviour:
   LeftTower: {fileID: 610756904435375513}
   Clear: {fileID: 8634318086059990844}
   _buttonPanel: {fileID: 5745889251747423429}
+  countText:
+  - {fileID: 4534484815600202976}
+  - {fileID: 1276152320676234563}
+  - {fileID: 5231544717228033525}
+  - {fileID: 2934557447584271813}
+  - {fileID: 5923290070588015938}
+  - {fileID: 2752495803284979986}
+  - {fileID: 5839846987874578101}
+  countImages:
+  - {fileID: 3151165749071470847}
+  - {fileID: 2681075554804411245}
+  - {fileID: 6068535652066293278}
+  - {fileID: 6048301500702713465}
+  - {fileID: 7119897666729176629}
+  - {fileID: 2420709131639653957}
+  - {fileID: 6234105369936982186}
   countRed: {fileID: 4534484815600202976}
   countGreen: {fileID: 1276152320676234563}
   countBlue: {fileID: 5231544717228033525}
@@ -8072,7 +8087,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Resume
+  m_Text: Back
 --- !u!1 &6542692932101265138
 GameObject:
   m_ObjectHideFlags: 0
@@ -10623,8 +10638,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -107}
-  m_SizeDelta: {x: 200, y: 70}
+  m_AnchoredPosition: {x: 0, y: -145}
+  m_SizeDelta: {x: 200, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9069240673204380833
 CanvasRenderer:
@@ -10669,11 +10684,10 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'X Types
 
-    Tower# Y
+    Tower Y
 
-    a
 
-    b'
+    Press "Esc" to toggle Tower view'
 --- !u!111 &1247513974060604414
 Animation:
   m_ObjectHideFlags: 0

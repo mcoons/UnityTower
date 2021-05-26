@@ -34,6 +34,9 @@ public class PlayMenu : MonoBehaviour
 
     [SerializeField] private GameObject _buttonPanel;
 
+    [SerializeField] private Text[] countText = new Text[7];
+    [SerializeField] private Image[] countImages = new Image[7];
+
     [SerializeField] private Text countRed;
     [SerializeField] private Text countGreen;
     [SerializeField] private Text countBlue;
@@ -79,13 +82,18 @@ public class PlayMenu : MonoBehaviour
         scoreText.text = GameManager.Instance.levelScore.ToString();
         selectedText.text = TowerManager.Instance.matchCount.ToString() + " Selected";
 
-        countRed.text = TowerManager.Instance.typeCounts[0].ToString();
-        countGreen.text = TowerManager.Instance.typeCounts[1].ToString();
-        countBlue.text = TowerManager.Instance.typeCounts[2].ToString();
-        countOrange.text = TowerManager.Instance.typeCounts[3].ToString();
-        countYellow.text = TowerManager.Instance.typeCounts[4].ToString();
-        countIndigo.text = TowerManager.Instance.typeCounts[5].ToString();
-        countViolet.text = TowerManager.Instance.typeCounts[6].ToString();
+
+        for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
+        {
+            countText[i].text = TowerManager.Instance.typeCounts[i].ToString();
+        }
+        //countRed.text = TowerManager.Instance.typeCounts[0].ToString();
+        //countGreen.text = TowerManager.Instance.typeCounts[1].ToString();
+        //countBlue.text = TowerManager.Instance.typeCounts[2].ToString();
+        //countOrange.text = TowerManager.Instance.typeCounts[3].ToString();
+        //countYellow.text = TowerManager.Instance.typeCounts[4].ToString();
+        //countIndigo.text = TowerManager.Instance.typeCounts[5].ToString();
+        //countViolet.text = TowerManager.Instance.typeCounts[6].ToString();
     }
 
     public void HandleClearClicked()
@@ -124,7 +132,13 @@ public class PlayMenu : MonoBehaviour
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
     {
         if ((previousState == GameManager.GameState.PREGAME && currentState == GameManager.GameState.RUNNING))
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                countImages[i].gameObject.SetActive( (i < GameManager.Instance._masterTypeCount ));
+            }
             FadeIn();
+        }
 
         if (previousState == GameManager.GameState.PAUSED && currentState == GameManager.GameState.PREGAME)
             FadeOut();

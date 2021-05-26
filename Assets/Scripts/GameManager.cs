@@ -79,6 +79,7 @@ public class GameManager : Singleton<GameManager>
             if (_loadOperations.Count == 0)
             {
                 UpdateState(GameState.RUNNING);
+                AudioManager.Instance.Build();
             }
         }
     }

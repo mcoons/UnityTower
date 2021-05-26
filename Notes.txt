@@ -1,27 +1,24 @@
 ﻿
 *** BUGS/TODO ***  Clean and Optimize Always
 
-Add more messaging when no timing/ordering issue
+
 Review Messaging logic for timing issues
+Add more messaging when no timing/ordering issue
+Fix Post Errors
 
 Clean unnecessary SerializedFields/permissions
 Change all data types to be dynamic for tower sizes
 
 Add Text to UI Manager
-- Make it clear to see tower outcome EoG
-- Selected
-- Score
-- Timer
+    Total Score
+    Timer
 
 Add audio
-    Rotation
-    Explosion
-    Win
-    Loss
     Tower Build sound?
 
 Add isGameOver() Logic
 Validate Tables upon build using game over rules
+If Seed produces Unplayable board then just rebuild.
 
 
 Add the ability for palette selection for color blind users.
@@ -105,4 +102,4 @@ Quickest winner
 Best of 5
 
 
-Only able to select a certain color(s)?
+Each playre is only able to select a certain color(s)?
