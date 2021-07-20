@@ -35,4 +35,9 @@ public class AudioManager : Singleton<AudioManager>
         if (!_build.activeInHierarchy) _build.SetActive(true);
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
+
 }

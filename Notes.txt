@@ -1,4 +1,26 @@
 ﻿
+A link to your project’s GitHub repo, showing multiple commits with commit messages and at least two branches
+
+Demonstration of abstraction (higher-level methods that abstract unnecessary details)
+
+
+Demonstration of inheritance (parent/child classes)
+- Managers are derivedd from a Singketon class which in turn derives from MonoBehaviour
+
+
+Demonstration of polymorphism (method overriding or overloading)
+- Managers override the Singleton OnDestroy() method but utilize base.OnDestroy().
+
+
+Demonstration of encapsulation (getters and setters)
+-The NameSelf() class encapsulates the _baseName property
+ 
+
+----------------------------------------
+
+
+
+
 *** BUGS/TODO ***  Clean and Optimize Always
 
 Add fade in animation to win/loss UI panels

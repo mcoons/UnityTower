@@ -28,4 +28,9 @@ public class ItemManager : Singleton<ItemManager>
     {
         return _grabBag.getRndNumber();
     }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
 }

@@ -87,4 +87,8 @@ public class TowerBuilder : Singleton<TowerBuilder>
         return towerParent;
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
 }

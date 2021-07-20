@@ -60,9 +60,11 @@ public class UIManager : Singleton<UIManager>
 
     protected override void OnDestroy()
     {
-        //base.OnDestroy();
 
         EventManager.Instance.OnMainMenuFadeComplete.RemoveListener(HandleMainMenuFadeComplete);
         EventManager.Instance.OnGameStateChanged.RemoveListener(HandleGameStateChanged);
+
+        base.OnDestroy();
+
     }
 }

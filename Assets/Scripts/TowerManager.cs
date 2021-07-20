@@ -647,7 +647,6 @@ public class TowerManager : Singleton<TowerManager>
 
     protected override void OnDestroy()
     {
-        base.OnDestroy();
 
         EventManager.Instance.OnObjectAdded.RemoveListener(HandleOnObjectAdded);
         EventManager.Instance.OnObjectMatched.RemoveListener(HandleOnObjectMatched);
@@ -657,6 +656,8 @@ public class TowerManager : Singleton<TowerManager>
 
         _levelTransforms.Clear();
         Destroy(_towerObject);
+
+        base.OnDestroy();
     }
 
 }
