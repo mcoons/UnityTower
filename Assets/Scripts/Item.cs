@@ -86,7 +86,6 @@ public class Item : MonoBehaviour
             //TowerManager.Instance.getColumnIntersects();
 
 
-
             transform.SetParent(GameObject.Find("Holder (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")").transform);
             
             transform.name = baseName + " (" + Mathf.Round(transform.position.x) + "," + Mathf.Round(transform.position.y) + "," + Mathf.Round(transform.position.z) + ")";

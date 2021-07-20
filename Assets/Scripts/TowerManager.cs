@@ -64,7 +64,6 @@ public class TowerManager : Singleton<TowerManager>
     List<Quaternion> levelDesiredRotation = new List<Quaternion>();
 
 
-
     private IEnumerator delayDestroyCoroutine;
 
     #endregion
