@@ -196,13 +196,13 @@ MonoBehaviour:
   _globalPosition: {x: 0, y: 0, z: 0}
   baseName: 
   _type: 0
+  fadeIn: 0
   selected: 0
   matched: 0
   isDropping: 0
   itemDropStartTime: 0
   itemStartPosition: {x: 0, y: 0, z: 0}
   itemDesiredPosition: {x: 0, y: 0, z: 0}
-  fadeIn: 0
   _itemAnimator: {fileID: 6471750458809083785}
   _explodeAnimation: {fileID: 7400000, guid: 426d05f2ee7664bd9980d8b750d66eb6, type: 2}
   selector: {fileID: 3100712031230411606}

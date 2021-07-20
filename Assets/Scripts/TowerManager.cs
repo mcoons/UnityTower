@@ -9,7 +9,10 @@ public class TowerManager : Singleton<TowerManager>
     [SerializeField] public int towerWidth  = 3;
     [SerializeField] public int towerHeight = 6;
 
+    [SerializeField] public GameObject blinkPrefab;
+
     public bool gameLost = false;
+    public string lossMsg = "";
     public bool gameWon = false;
 
     public enum ItemType
@@ -195,7 +198,7 @@ public class TowerManager : Singleton<TowerManager>
 
     public void CalculateScore()
     {
-        GameManager.Instance.levelScore += (int)Mathf.Pow(2.0f, (float)TowerManager.Instance.matchCount);
+        GameManager.Instance.levelScore += TowerManager.Instance.matchCount * TowerManager.Instance.matchCount;
     }
 
     public void UpdateGemTypeCount(int newCount)
@@ -346,17 +349,22 @@ public class TowerManager : Singleton<TowerManager>
     public bool CheckLoss()
     {
         gameLost = false;
+        lossMsg = "";
+        Debug.Log("---------------------------");
         Debug.Log("In CheckEndGame");
         for (int i = 0; i < GameManager.Instance._masterTypeCount; i++)
         {
             // Any single Type alone
-
-            gameLost = gameLost || IsLoneSurvivor((TowerManager.ItemType) i);
+            Debug.Log("IsLoneSurvivor((TowerManager.ItemType)i): " + IsLoneSurvivor((TowerManager.ItemType)i).ToString());
+            gameLost = gameLost || IsLoneSurvivor((TowerManager.ItemType)i);
 
             // all in the center column
-            //gameLost = gameLost || AreAllCenter((TowerManager.ItemType)i);
+            Debug.Log("AreAllCenter((TowerManager.ItemType)i): " + AreAllCenter((TowerManager.ItemType)i).ToString());
+            gameLost = gameLost || AreAllCenter((TowerManager.ItemType)i);
 
             // all in the center column and corner columns
+            //Debug.Log("AreAllCenterCorner((TowerManager.ItemType)i): " + AreAllCenterCorner((TowerManager.ItemType)i).ToString());
+            //gameLost = gameLost || AreAllCenterCorner((TowerManager.ItemType)i);
 
             // all on bottom and not neighbors
 
@@ -366,9 +374,12 @@ public class TowerManager : Singleton<TowerManager>
 
         if (gameLost)
         {
+            Debug.Log(lossMsg);
             EventManager.Instance.OnGameLoss.Invoke();
             AudioManager.Instance.Loss();
         }
+
+
         return gameLost;
 
     }
@@ -376,48 +387,57 @@ public class TowerManager : Singleton<TowerManager>
 
     bool IsLoneSurvivor(TowerManager.ItemType itemType)
     {
-        bool retval = false;
+        if (typeCounts[(int)itemType] == 1)
+        {
+            lossMsg = "There is only one " + itemType.ToString();
+            return true;
+        }
 
-        if (typeCounts[(int)itemType] == 1) retval = true;
-
-        return retval;
+        return false;
     }
-
 
     bool AreAllCenter(TowerManager.ItemType itemType)
     {
-        bool retval = true;
-
         getColumnIntersects();
 
-        foreach (GameObject go in typeGroups[(int)itemType])
-        {
-            if (!(go.transform.position.x == 0 && go.transform.position.y == 0))
-            {
-                retval = false;
-            }
-        }
+        if (typeGroups[(int)itemType].Count == 0)
+            return false;
 
-        return retval;
+        foreach (GameObject go in typeGroups[(int)itemType])
+            if (!(go.GetComponent<Item>()._globalPosition.x == 0 && go.GetComponent<Item>()._globalPosition.z == 0))
+
+                //if (!(Mathf.Round(go.transform.position.x) == 0 && Mathf.Round(go.transform.position.z) == 0))
+                return false;
+
+        lossMsg = itemType.ToString() + " are all in the center";
+
+        return true;
     }
 
     bool AreAllCenterCorner(TowerManager.ItemType itemType)
     {
-        bool retval = false;
+        if (typeGroups[(int)itemType].Count == 0)
+            return false;
 
+        foreach (var go in typeGroups[(int)itemType])
+        {
+            Debug.Log(go.name);
+            if (Mathf.Abs(go.GetComponent<Item>()._globalPosition.x) + Mathf.Abs(go.GetComponent<Item>()._globalPosition.z) == 1)
+                return false;
+        }
 
+        lossMsg = itemType.ToString() + " are all in the center and corners";
 
-        return retval;
+        return true;
     }
-
 
     bool AreAllLonelyBottomDwellers(TowerManager.ItemType itemType)
     {
-        bool retval = false;
+        foreach (var item in typeGroups[(int)itemType])
+            if (item.transform.position.y > 0)
+                return false;
 
-
-
-        return retval;
+        return true;
     }
 
 

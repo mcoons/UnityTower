@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7002372563032747637, guid: 6c0198d04f12540338759476698f9d1d, type: 3}
+      propertyPath: blinkPrefab
+      value: 
+      objectReference: {fileID: 4029388112264855442, guid: c1250a051c6dc4dd1a1a35d113d53de7, type: 3}
     - target: {fileID: 7427867636364129290, guid: 6c0198d04f12540338759476698f9d1d, type: 3}
       propertyPath: m_Name
       value: TowerManager

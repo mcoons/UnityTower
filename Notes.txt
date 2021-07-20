@@ -1,6 +1,7 @@
 ﻿
 *** BUGS/TODO ***  Clean and Optimize Always
 
+Add fade in animation to win/loss UI panels
 
 Review Messaging logic for timing issues
 Add more messaging when no timing/ordering issue
@@ -17,7 +18,7 @@ Add audio
     Tower Build sound?
 
 Add isGameOver() Logic
-Validate Tables upon build using game over rules
+Validate Towers upon build using game over rules
 If Seed produces Unplayable board then just rebuild.
 
 
@@ -35,12 +36,12 @@ Game Types
 Without Dropper/Extinction (dwindling)
 - Clear the board
 - Move these items there
--
+- Immovable blocks to avoid
 
 With Dropper/Feeder (replenishment)
 - Timed Levels for points
 - Create a shape and remove it (column, plane, etc.)
--
+- 
 
 Difficulty
 - Increase in types

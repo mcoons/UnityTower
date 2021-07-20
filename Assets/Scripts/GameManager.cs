@@ -134,6 +134,7 @@ public class GameManager : Singleton<GameManager>
             case GameState.WIN:
                 Debug.Log("Game Won");
                 Time.timeScale = 1.0f;
+                totalScore += levelScore;
                 break;
 
             case GameState.LOSS:
