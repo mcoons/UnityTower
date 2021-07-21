@@ -13,19 +13,24 @@ public class GrabBag
 	List<int> bagList = new List<int> ();
 
 	// Default values to fill the bag with
-	int defaultMin = 0;
-	int defaultMax = 99;
-	int defaultDups = 1;
+	int _Min = 0;
+	int _Max = 99;
+	int _Dups = 1;
 
-	// Property access methods
-	public int 		getMin()		{ return defaultMin; }
-	public void 	setMin(int x) 	{ defaultMin = x; }
-	public int 		getMax()		{ return defaultMax; }
-	public void 	setMax(int x) 	{ defaultMax = x; }
-	public int 		getDups()		{ return defaultDups; }
-	public void 	setDups(int x)	{ defaultDups = x; }
+	// ENCAPSULATION
+    public int Min  { get => _Min;  set => _Min  = value; }
+	public int Max  { get => _Max;  set => _Max  = value; }
+    public int Dups { get => _Dups; set => _Dups = value; }
+
+    //public int 	getMin()		{ return Min; }
+	//public void 	setMin(int x) 	{ Min = x; }
+	//public int 	getMax()		{ return Max; }
+	//public void 	setMax(int x) 	{ Max = x; }
+	//public int 	getDups()		{ return Dups; }
+	//public void 	setDups(int x)	{ Dups = x; }
 	public int 		getSize()		{ return bagList.Count;	}
 	public void 	emptyBag()		{ bagList.Clear ();	}
+
 	public string	showBag()
 	{
 		string retVal = "";
@@ -58,10 +63,11 @@ public class GrabBag
 		RandomizeList (bagList);
 	}
 
+	// POLYMORPHISM - overloading addRange()
 	// Default method to add the default range to the existing contents of the bag
 	public void addRange()
 	{
-		addRange (defaultMin, defaultMax, defaultDups);
+		addRange (_Min, _Max, _Dups);
 	}
 
 	// Method to add to the bag the range from 'min' to 'max' in multiples of 'duplicates'

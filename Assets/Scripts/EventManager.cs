@@ -34,6 +34,7 @@ public class CustomEvents
 // EventManager.Instance.OnObjectMatched.AddListener(HandleOnObjectMatched);
 // EventManager.Instance.OnObjectMatched.Invoke(transform.name, type, _globalPosition);
 
+// INHERITANCE
 public class EventManager : Singleton<EventManager>
 {
     // GameManager
@@ -71,6 +72,7 @@ public class EventManager : Singleton<EventManager>
         DontDestroyOnLoad(gameObject);
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
         base.OnDestroy();

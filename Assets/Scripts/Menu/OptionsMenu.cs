@@ -23,7 +23,7 @@ public class OptionsMenu : MonoBehaviour
     {
         _tagline.GetComponent<UnityEngine.UI.Text>().text =
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance.levelSeed.ToString();
+            "Tower " + GameManager.Instance._levelSeed.ToString();
     }
 
 
@@ -37,8 +37,8 @@ public class OptionsMenu : MonoBehaviour
     void HandleNextClicked()
     {
         //TODO: Turn to messaging
-        GameManager.Instance.levelSeed++;
-        GameManager.Instance._masterTypeCount = Mathf.Min( 3 + (int)(GameManager.Instance.levelSeed / 5), 7);
+        GameManager.Instance._levelSeed++;
+        GameManager.Instance._masterTypeCount = Mathf.Min( 3 + (int)(GameManager.Instance._levelSeed / 5), 7);
 
         GameManager.Instance.RestartGame();
     }

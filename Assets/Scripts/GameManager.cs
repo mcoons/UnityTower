@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// INHERITANCE
 public class GameManager : Singleton<GameManager>
 {
 
@@ -31,7 +32,7 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] GameState _currentGameState = GameState.PREGAME;
     [SerializeField] private string _currentLevelName = string.Empty;
-    public int levelSeed = 1;
+    public int _levelSeed = 1;
     public int _masterTypeCount = 3;
 
     public GameState CurrentGameState
@@ -202,6 +203,7 @@ public class GameManager : Singleton<GameManager>
 
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
         base.OnDestroy();

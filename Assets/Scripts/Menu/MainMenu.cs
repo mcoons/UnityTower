@@ -16,7 +16,7 @@ public class MainMenu : MonoBehaviour
         txt.GetComponent<UnityEngine.UI.Text>().text =
             "Can you master\n the \nTower of Puzzles?\n\n" +
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance.levelSeed.ToString();
+            "Tower " + GameManager.Instance._levelSeed.ToString();
     }
 
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
@@ -29,7 +29,7 @@ public class MainMenu : MonoBehaviour
             txt.GetComponent<UnityEngine.UI.Text>().text =
                 "Can you master\n the \nTower of Puzzles?\n\n" +
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance.levelSeed.ToString();
+            "Tower " + GameManager.Instance._levelSeed.ToString();
             FadeIn();
         }
     }

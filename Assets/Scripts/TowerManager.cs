@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// INHERITANCE
 public class TowerManager : Singleton<TowerManager>
 {
     [SerializeField] public int towerLength = 3;
@@ -644,6 +645,7 @@ public class TowerManager : Singleton<TowerManager>
         }
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
 
