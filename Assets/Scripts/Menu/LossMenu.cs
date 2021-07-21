@@ -24,7 +24,7 @@ public class LossMenu : MonoBehaviour
     {
         _tagline.GetComponent<UnityEngine.UI.Text>().text =
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance.levelSeed.ToString() + "\n\n" +
+            "Tower " + GameManager.Instance._levelSeed.ToString() + "\n\n" +
             "Press 'Esc' to toggle\nTower view";
     }
 
@@ -38,8 +38,8 @@ public class LossMenu : MonoBehaviour
     void HandleNextClicked()
     {
         //TODO: Turn to messaging
-        GameManager.Instance.levelSeed++;
-        GameManager.Instance._masterTypeCount = Mathf.Min(3 + (int)(GameManager.Instance.levelSeed / 5), 7);
+        GameManager.Instance._levelSeed++;
+        GameManager.Instance._masterTypeCount = Mathf.Min(3 + (int)(GameManager.Instance._levelSeed / 5), 7);
 
         GameManager.Instance.RestartGame();
     }

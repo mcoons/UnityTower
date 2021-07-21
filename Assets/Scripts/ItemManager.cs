@@ -2,6 +2,7 @@ using UnityEngine;
 
 // Dispenses the types of objects
 
+// INHERITANCE
 public class ItemManager : Singleton<ItemManager>
 {
     GrabBag _grabBag = new GrabBag();
@@ -14,12 +15,12 @@ public class ItemManager : Singleton<ItemManager>
 
     public void initBag()
     {
-        Random.InitState(GameManager.Instance.levelSeed);
+        Random.InitState(GameManager.Instance._levelSeed);
 
-        _grabBag.setMax(GameManager.Instance._masterTypeCount - 1);
-        _grabBag.setDups((int)(TowerManager.Instance.towerLength *
+        _grabBag.Max = GameManager.Instance._masterTypeCount - 1;
+        _grabBag.Dups = (int)(TowerManager.Instance.towerLength *
             TowerManager.Instance.towerWidth *
-            TowerManager.Instance.towerHeight / GameManager.Instance._masterTypeCount) + 1);
+            TowerManager.Instance.towerHeight / GameManager.Instance._masterTypeCount) + 1;
         _grabBag.fillBag();
         _grabBag.shakeBag();
     }
@@ -29,6 +30,7 @@ public class ItemManager : Singleton<ItemManager>
         return _grabBag.getRndNumber();
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
         base.OnDestroy();

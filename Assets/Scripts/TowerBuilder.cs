@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// INHERITANCE
 public class TowerBuilder : Singleton<TowerBuilder>
 {
     public GameObject _itemHolderPrefab;
@@ -87,6 +88,7 @@ public class TowerBuilder : Singleton<TowerBuilder>
         return towerParent;
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
         base.OnDestroy();

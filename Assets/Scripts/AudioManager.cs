@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// INHERITANCE
 public class AudioManager : Singleton<AudioManager>
 {
     [SerializeField] GameObject _build;
@@ -35,6 +36,7 @@ public class AudioManager : Singleton<AudioManager>
         if (!_build.activeInHierarchy) _build.SetActive(true);
     }
 
+    // POLYMORPHISM - overriding OnDestroy()
     protected override void OnDestroy()
     {
         base.OnDestroy();

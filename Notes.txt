@@ -5,16 +5,18 @@ Demonstration of abstraction (higher-level methods that abstract unnecessary det
 
 
 Demonstration of inheritance (parent/child classes)
-- Managers are derivedd from a Singketon class which in turn derives from MonoBehaviour
-
+- Managers are derived from a Singleton class which in turn derives from MonoBehaviour
 
 Demonstration of polymorphism (method overriding or overloading)
 - Managers override the Singleton OnDestroy() method but utilize base.OnDestroy().
-
+_ The GrabBag class Overloads addRange() and addRange(int min, int max, int duplicates)
 
 Demonstration of encapsulation (getters and setters)
--The NameSelf() class encapsulates the _baseName property
- 
+- The GrabBag class utilizes property access methods for:
+
+    public int Dups { get => _Dups; set => _Dups = value; }
+    public int Max { get => _Max; set => _Max = value; }
+    public int Min { get => _Min; set => _Min = value; }
 
 ----------------------------------------
 
