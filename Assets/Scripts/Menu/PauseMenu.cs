@@ -1,29 +1,22 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class PauseMenu : MonoBehaviour
+public class PauseMenu : MenuPanel
 {
-    [SerializeField] private Text   _tagline;
+    [SerializeField] private Button _helpButton;
     [SerializeField] private Button _optionsButton;
-    [SerializeField] private Button _resumeButton;
-    [SerializeField] private Button _restartButton;
-    [SerializeField] private Button _nextButton;
-    [SerializeField] private Button _quitButton;
 
-    private void Start()
+    [SerializeField] public Button _resumeButton;
+
+
+    new void Start()
     {
+        base.Start();
+        _helpButton.onClick.AddListener(HandleHelpClicked);
         _optionsButton.onClick.AddListener(HandleOptionsClicked);
-        _resumeButton.onClick.AddListener(HandleResumeClicked);
-        _restartButton.onClick.AddListener(HandleRestartClicked);
-        _nextButton.onClick.AddListener(HandleNextClicked);
-        _quitButton.onClick.AddListener(HandleQuitClicked);
-    }
 
-    private void OnEnable()
-    {
-        _tagline.GetComponent<UnityEngine.UI.Text>().text =
-            "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance._levelSeed.ToString();
+        _resumeButton.onClick.AddListener(HandleResumeClicked);
+
     }
 
     void HandleOptionsClicked()
@@ -33,29 +26,18 @@ public class PauseMenu : MonoBehaviour
         GameManager.Instance.OnOptions();
     }
 
-    void HandleNextClicked()
+
+    void HandleHelpClicked()
     {
         //TODO: Turn to messaging
-        GameManager.Instance._levelSeed++;
-        GameManager.Instance._masterTypeCount =  Mathf.Min( 3 + (int)(GameManager.Instance._levelSeed / 5), 7);
-
-        GameManager.Instance.RestartGame();
+        Debug.Log("Help Clicked");
+        GameManager.Instance.OnHelp();
     }
+
 
     void HandleResumeClicked()
     {
         GameManager.Instance.TogglePause();
     }
-
-    void HandleRestartClicked()
-    {
-        GameManager.Instance.RestartGame();
-    }
-
-    void HandleQuitClicked()
-    {
-        GameManager.Instance.QuitGame();
-    }
-
 
 }

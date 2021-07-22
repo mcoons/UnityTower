@@ -6,8 +6,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private AnimationClip _fadeOutAnimation;
     [SerializeField] private AnimationClip _fadeInAnimation;
 
-    //public Events.EventFadeComplete OnMainMenuFadeComplete;
-
     public GameObject txt;
 
     private void Start()
@@ -16,7 +14,7 @@ public class MainMenu : MonoBehaviour
         txt.GetComponent<UnityEngine.UI.Text>().text =
             "Can you master\n the \nTower of Puzzles?\n\n" +
             "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance._levelSeed.ToString();
+            "Tower #" + GameManager.Instance._levelSeed.ToString();
     }
 
     void HandleGameStateChanged(GameManager.GameState currentState, GameManager.GameState previousState)
@@ -26,10 +24,6 @@ public class MainMenu : MonoBehaviour
 
         if (previousState != GameManager.GameState.PREGAME && currentState == GameManager.GameState.PREGAME)
         {
-            txt.GetComponent<UnityEngine.UI.Text>().text =
-                "Can you master\n the \nTower of Puzzles?\n\n" +
-            "Type " + GameManager.Instance._masterTypeCount.ToString() + "\n" +
-            "Tower " + GameManager.Instance._levelSeed.ToString();
             FadeIn();
         }
     }

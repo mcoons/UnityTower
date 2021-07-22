@@ -19,7 +19,8 @@ public class GameManager : Singleton<GameManager>
         OPTIONS,
         COLORSELECTION,
         WIN,
-        LOSS
+        LOSS,
+        HELP
     }
 
     public int totalScore = 0;
@@ -129,6 +130,11 @@ public class GameManager : Singleton<GameManager>
 
             case GameState.COLORSELECTION:
                 Debug.Log("Colors Menu");
+                Time.timeScale = 0.0f;
+                break;
+
+            case GameState.HELP:
+                Debug.Log("Help Menu");
                 Time.timeScale = 0.0f;
                 break;
 
@@ -258,6 +264,11 @@ public class GameManager : Singleton<GameManager>
             UpdateState(GameState.OPTIONS);
         }
         else
+        if (_currentGameState == GameState.HELP)
+        {
+            UpdateState(GameState.PAUSED);
+        }
+        else
         if (_currentGameState == GameState.WIN || _currentGameState == GameState.LOSS)
         {
             UpdateState(GameState.RUNNING);
@@ -272,6 +283,12 @@ public class GameManager : Singleton<GameManager>
     public void OnColorSelection()
     {
         UpdateState(GameState.COLORSELECTION);
+    }
+
+
+    public void OnHelp()
+    {
+        UpdateState(GameState.HELP);
     }
 
     public void RestartGame()
